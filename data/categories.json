@@ -1,0 +1,15 @@
+{
+  "Coffee": ["starbucks", "tim hortons", "jj bean", "matchstick", "49th parallel", "revolver", "pallet coffee", "cafe", "coffee"],
+  "Groceries": ["save-on", "save on foods", "safeway", "no frills", "t&t", "whole foods", "superstore", "nesters", "urban fare", "costco"],
+  "Dining": ["mcdonald", "a&w", "subway", "chipotle", "uber eats", "doordash", "skip the dishes", "restaurant", "pizza", "sushi", "ramen", "pho"],
+  "Transport": ["compass", "translink", "evo car", "modo", "uber trip", "lyft", "grab ", "petro", "shell", "chevron", "esso", "husky", "parking", "impark", "easypark", "paybyphone", "bc ferries", "seabus", "flighthub"],
+  "Clothing": ["gymshark", "lululemon", "aritzia"],
+  "Self Care": ["shoppers drug", "london drugs", "rexall", "lush", "sephora", "the body shop", "bath & body", "barber", "salon", "haircut"],
+  "Shopping": ["amazon", "amzn", "aliexpress", "temu", "best buy", "canadian tire", "ikea", "winners", "nike", "foot locker", "uniqlo"],
+  "Car": ["autoparts", "auto parts", "rock auto", "rockauto", "carzilla", "napa", "lordco", "fcp euro", "bmw", "icbc", "car wash"],
+  "Health & Fitness": ["golf", "gym", "fitness", "athletic club", "anytime", "goodlife", "club16", "yoga", "pharmacy"],
+  "Internet": ["shaw", "novus"],
+  "Alcohol": ["liquor", "bcl "],
+  "Fun": ["steam purchase", "steamgames"],
+  "Subscriptions": ["netflix", "spotify", "youtube", "icloud", "apple.com/bill", "applecombill", "anthropic", "claude.ai", "openai", "porkbun", "tailscale", "disney"]
+}

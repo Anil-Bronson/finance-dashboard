@@ -1,0 +1,13 @@
+.env
+data/*.db
+data/*.db-*
+__pycache__/
+.venv/
+shortcuts/out/
+*.zip
+data/backups/
+.env.*
+!.env.example
+# personal, kept local only
+CLAUDE.md
+scripts/import_actual*.py

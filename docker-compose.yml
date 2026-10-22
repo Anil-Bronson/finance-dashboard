@@ -1,0 +1,21 @@
+# Standalone compose file. To merge into your main stack instead, copy the
+# `spend` service and add `<<: *default-dns` like your other services.
+x-dns: &default-dns
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+services:
+  spend:
+    <<: *default-dns
+    build: .
+    container_name: spend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"   # only reachable through Caddy (TRUSTED_DEVICES relies on this)
+    env_file: .env
+    extra_hosts:
+      # reach ntfy through the host's Caddy directly, so the weekly push doesn't depend on public DNS
+      - "ntfy.anilbronson.dev:host-gateway"
+    volumes:
+      - ./data:/data

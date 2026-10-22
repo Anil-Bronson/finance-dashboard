@@ -1,0 +1,8 @@
+# Add to your existing Caddyfile. Copy the `tls { dns porkbun ... }` block
+# exactly as your other *.anilbronson.dev sites have it.
+# Point spend.anilbronson.dev at the OptiPlex's Tailscale IP in Porkbun,
+# same as your other tailnet-only subdomains.
+spend.anilbronson.dev {
+	reverse_proxy localhost:8090
+	# tls { dns porkbun { ... } }   <- same as your other sites
+}
