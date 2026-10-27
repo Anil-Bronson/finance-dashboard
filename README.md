@@ -3,7 +3,7 @@
 My own finance tracker: every purchase, paycheque, account and subscription in one place, running on the home server at **https://spend.anilbronson.dev** (tailnet only).
 
 ```
-Apple Pay tap ──▶ iPhone Shortcut ──▶ POST /tx/batch ─┐
+Apple Pay tap ──▶ iPhone Shortcut ──▶ POST /tx ───────┐
 bank statement CSV ──▶ Import (preview, then save) ───┤
 paycheque, gym, iCloud… ──▶ recurring entries ────────┼──▶ FastAPI + SQLite (Docker, port 127.0.0.1:8090)
 cash, anything else ──▶ "+ Add" in the dashboard ─────┘        │  behind Caddy (HTTPS, Porkbun DNS-01)
@@ -44,7 +44,7 @@ cash, anything else ──▶ "+ Add" in the dashboard ─────┘       
 ### How money gets in
 | Source | How |
 |---|---|
-| **Apple Pay** | The Transaction automation runs *Log Purchase*, which queues the tap and runs *Flush Purchases* → `/tx/batch`. Offline taps wait in the iCloud queue file and are sent on the next flush; duplicates are ignored. |
+| **Apple Pay** | The Transaction automation runs *Auto Apple Pay*, which sends merchant, amount and card straight to `/tx`. There's no queue, so a tap made while Tailscale is off or the server is unreachable isn't logged; add it with **+ Add**. A declined tap sends empty fields, which the server skips (it logs `skipped tx with empty amount`). The older *Log Purchase* / *Flush Purchases* queue → `/tx/batch` still works. |
 | **Bank statements** | Accounts card → **Import CSV**: pick the account, then the CSV exported from the bank. Nothing is saved until you've reviewed the preview (below). |
 | **Recurring** | Paycheque, gym, iCloud…: monthly, weekly or every 2 weeks, as spending or income (into an account). Each one is logged automatically on its day. Pause or remove anytime; past entries stay. |
 | **+ Add** | Cash, or anything else. The **Purchase / Income** switch is at the top of the form. |
@@ -163,8 +163,8 @@ All endpoints need `Authorization: Bearer <API_TOKEN>` (or a trusted device), ex
 
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `/tx/batch` | phone queue flush, `{"lines": "ts\|amount\|card\|merchant\n…"}` |
-| POST | `/tx` | add one (`amount, merchant, card, ts, category, note, source, currency`) |
+| POST | `/tx` | add one (`amount, merchant, card, ts, category, note, source, currency`); used by the *Auto Apple Pay* Shortcut. An empty `amount` is skipped: 200 `{"skipped": "empty amount"}`, nothing saved |
+| POST | `/tx/batch` | older phone queue flush, `{"lines": "ts\|amount\|card\|merchant\n…"}`; empty-amount lines count as `skipped` |
 | GET | `/tx` | `start, end, category, q, review, need (need\|want\|unrated), limit, offset` |
 | PATCH / DELETE | `/tx/{id}` | edit (`category` + `apply_to_merchant`, `need`, `amount`, `ts`, `merchant`, `note`, `card`) |
 | GET / POST / PATCH / DELETE | `/categories[/{name}]` | categories, budgets, colors, `description` (guides the AI) |
