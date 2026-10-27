@@ -195,6 +195,15 @@ assert s["budget"] == 2000
 r = c.post("/tx/batch", headers=H, json={"lines": f"{iso(now)}|$5.25|Amex|Matchstick Coffee\n \nbad"}).json()
 assert r["added"] == 1 and len(r["errors"]) == 1
 
+# declined tap: the Shortcut sends empty fields; skipped (200), not saved, not an error
+before = c.get("/tx", headers=H).json()["count"]
+r = c.post("/tx", headers=H, json={"amount": "", "merchant": "", "card": "", "ts": iso(now)})
+assert r.status_code == 200 and r.json()["skipped"] == "empty amount" and r.json()["id"] is None
+r = c.post("/tx/batch", headers=H, json={"lines": f"{iso(now)}| ||\n{iso(now)}|$3.00|Visa|Kiosk"}).json()
+assert r["added"] == 1 and r["skipped"] == 1 and r["errors"] == []
+assert c.get("/tx", headers=H).json()["count"] == before + 1
+assert c.post("/tx", headers=H, json={"amount": "abc", "merchant": "X"}).status_code == 422
+
 # ---- foreign currency ----
 assert main.parse_money("$12.34") == (1234, "CAD")
 assert main.parse_money("CA$5.00") == (500, "CAD")

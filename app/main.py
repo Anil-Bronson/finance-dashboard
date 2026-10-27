@@ -938,8 +938,16 @@ def insert(c, ts, money: dict, merchant, card, category=None, source="tap", note
     return cur.lastrowid if cur.rowcount == 1 else None
 
 
+def blank_amount(raw) -> bool:
+    # a declined Apple Pay tap still runs the Shortcut, with empty amount/merchant/card
+    return isinstance(raw, str) and not raw.strip()
+
+
 @app.post("/tx", dependencies=A)
 def add_tx(t: TxIn, bg: BackgroundTasks):
+    if blank_amount(t.amount):
+        log.warning("skipped tx with empty amount: merchant=%r card=%r ts=%r", t.merchant, t.card, t.ts)
+        return {"ok": True, "id": None, "duplicate": False, "skipped": "empty amount"}
     try:
         ts = parse_ts(t.ts)
         money = prepare_money(t.amount, ts, t.currency)
@@ -959,7 +967,7 @@ class Batch(BaseModel):
 
 @app.post("/tx/batch", dependencies=A)
 def add_batch(b: Batch, bg: BackgroundTasks):
-    added = dupes = 0
+    added = dupes = skipped = 0
     errors = []
     parsed = []  # parse and convert first: conversion may hit the network
     for n, line in enumerate(b.lines.splitlines(), 1):
@@ -971,6 +979,10 @@ def add_batch(b: Batch, bg: BackgroundTasks):
             errors.append(f"line {n}: expected ts|amount|card|merchant")
             continue
         ts, amount, card, merchant = parts
+        if blank_amount(amount):
+            log.warning("batch skipped line %d with empty amount: %r", n, line)
+            skipped += 1
+            continue
         try:
             ts = parse_ts(ts)
             parsed.append((ts, prepare_money(amount, ts), merchant, card))
@@ -984,7 +996,7 @@ def add_batch(b: Batch, bg: BackgroundTasks):
     if errors:
         log.warning("batch rejected lines: %s", errors)
     bg.add_task(enrich_pending)
-    return {"ok": True, "added": added, "duplicates": dupes, "errors": errors}
+    return {"ok": True, "added": added, "duplicates": dupes, "skipped": skipped, "errors": errors}
 
 
 # ---------- transactions ----------
