@@ -22,6 +22,8 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Request
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -60,6 +62,13 @@ def bad_value(request: Request, e: ValueError):
     string) is the caller's mistake: 422, not a 500."""
     log.warning("bad value on %s: %s", request.url.path, e)
     return JSONResponse({"detail": str(e)}, status_code=422)
+
+
+@app.exception_handler(RequestValidationError)
+async def bad_body(request: Request, e: RequestValidationError):
+    """Log why a request body was rejected (a Shortcut sending null or the wrong type); same 422 as FastAPI's."""
+    log.warning("invalid request on %s: %s", request.url.path, e.errors())
+    return await request_validation_exception_handler(request, e)
 
 # Categorical palette, fixed order (light, dark). Color follows the category.
 PALETTE = [
@@ -952,6 +961,7 @@ def add_tx(t: TxIn, bg: BackgroundTasks):
         ts = parse_ts(t.ts)
         money = prepare_money(t.amount, ts, t.currency)
     except ValueError as e:
+        log.warning("rejected tx: %s (merchant=%r card=%r)", e, t.merchant, t.card)
         raise HTTPException(422, str(e))
     with db() as c:
         if t.category:
