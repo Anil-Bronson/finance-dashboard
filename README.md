@@ -27,22 +27,22 @@ cash, anything else ──▶ "+ Add" in the dashboard ─────┘       
 - Both are remembered per device, so hiding on the Mac doesn't hide on the phone.
 
 ### Dashboard
-The app fills the window. Each sidebar item is its own tab (Dashboard, Analytics, Transactions, Budgets, Accounts, Recurring, Income), and the page itself never scrolls. A tab scrolls only if it doesn't fit, and it stops at its end. The transaction table shows as many rows as fit.
+The app fills the window. Each sidebar item is its own tab (Dashboard, Analytics, Transactions, Budgets, Accounts, Recurring, Income, Settings), and the page itself never scrolls. A tab scrolls only if it doesn't fit, and it stops at its end. On the Dashboard tab the transaction table scrolls in place through the whole month. On the Transactions tab it shows as many rows as fit and pages through the rest.
 
 - **Top of the page:** net worth, income and expenses against last month, plus an alert line for the worst budget or the biggest jump.
-- **My Cards and Spending:** your cards and their balances (tap to see the next one), then spent so far against your budget, with the outlined bar marking an even pace.
+- **My Cards and Spending:** your cards and their balances (tap to see the next one), then spent so far against your budget, with a small marker showing an even pace.
 - **Month stats:** the daily average, a projected month-end, and a comparison with last month. **Optional (wants)** shows how much of the month was optional; tap it to list every optional purchase.
-- **Daily spend calendar:** each day is shaded by spend (brighter teal = more on the dark theme, darker teal on the light one). Tap a day to see its purchases.
-- **Categories:** this month vs last, with budget markers. Tap one to filter the list.
-- **Cash flow:** income, spending, net and savings rate for the month, plus the month's income entries. Use "+ Income" to log one.
-- **Accounts:** balances, assets minus what you owe, and a chart of net worth by month.
+- **Analytics:** twelve months stacked by category, where the month went, biggest changes against last month, top merchants, and a calendar shaded by spend (brighter teal = more on the dark theme, darker teal on the light one) with week totals and the average weekday. Tap a day, merchant or category to see its purchases.
+- **Budgets:** the month's gauge and what's left per day, how the budget is split, then what needs attention and what's on track, each against your typical month. Tap one to see its purchases.
+- **Income:** income against spending by month, where it comes from this year, the month's payments, and what you're owed. Use "+ Income" to log one.
+- **Accounts:** net worth by month, what makes up your assets and debts, and a card for each account. Tap a balance to update it.
 - **Transactions:**
-  - Search, filter, edit, or delete, 10 to a page. A negative amount is a refund. Tick rows to add them up.
+  - Search, filter, edit, or delete. Tapping a row opens its details on the right, with every past purchase at that merchant. A negative amount is a refund. Tick rows to add them up.
   - Tap a category pill to change it, or to confirm an **AI?** pick.
   - "N to review" filters to the AI's unsure picks.
 - **Cash Flow Overview:** income and spending lines, Monthly (Jan–Dec), Weekly or Daily. Tap a month to open it, or a day to see its purchases.
-- **Top merchants and Recurring:** your repeating payments and income, plus **"Looks like a subscription"** suggestions.
-- **Settings:** category names and colors, and the default income account. The moon/sun switch in the header picks dark (the default) or light.
+- **Recurring:** the month on one line, what's upcoming, what's logged, how much of your income is committed, plus **"Looks like a subscription"** suggestions.
+- **Settings:** category names and colors, the default income account, and the status of AI, the weekly summary and this device. The moon/sun switch in the header picks dark (the default) or light.
 - `?month=2026-09` in the URL opens a specific month, and `#transactions` (or any tab's name) opens that tab.
 
 ### How money gets in

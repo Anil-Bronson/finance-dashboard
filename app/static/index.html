@@ -15,7 +15,7 @@
   --accent: #128a9c; --link: #0f7485; --gold: #a9861f; --good: #1a7a12; --bad: #c43a3a; --warn: #8f6a00;
   --good-bg: #dcf3d7; --good-ink: #17600f; --bad-bg: #f8dddc; --bad-ink: #a32a2a; --warn-bg: #f5ecc7; --warn-ink: #6f5300;
   --heat-0: #efefec; --heat-1: #d3eef0; --heat-2: #a5dde2; --heat-3: #6cc2cb; --heat-4: #2f9aa6; --heat-5: #0f6a75;
-  --card-a: #ffffff; --card-b: #f3f3f1; --face-a: #e2e2df; --face-b: #cfcfcb; --face-ink: #4b4b48; --tile-a: #ffffff; --tile-b: #e9e9e6;
+  --card-a: #ffffff; --card-b: #f3f3f1; --face-a: #f4f4f1; --face-b: #e6e6e1; --face-ink: #4b4b48; --tile-a: #ffffff; --tile-b: #e9e9e6;
   --glow: #bfe0ec; --glow-edge: #8cc7d8; --tooltip: #ffffff; --heat-top: #fff;
   --shadow: none; --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -43,6 +43,8 @@ body {
 }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 a { color: var(--link); }
 .num { font-variant-numeric: tabular-nums; }
 
@@ -136,11 +138,8 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 #txcard .tfoot { margin-top: auto; flex: none; }
 #txcard .tr { flex: none; }
 #txcard .tbl .tr:not(.th) { flex: 1 0 auto; max-height: 66px; }
-#acccard { display: flex; flex-direction: column; }
-.trend.nwchart { flex: 1 1 90px; height: auto; min-height: 90px; max-height: 260px; margin-top: 12px; }
+.tbody { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--axis) transparent; }
 @media (max-width: 860px) { .span-7, .span-5, .span-8, .span-4, .span-6 { grid-column: span 12; } }
-#cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px 16px; align-items: start; }
-#cats .bud-sum, #cats .empty { grid-column: 1 / -1; }
 .card h2 { font-size: 16px; font-weight: 400; color: var(--ink); margin: 0 0 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .card h2 .right { margin-left: auto; font-weight: 400; }
 .ghost { background: none; border: 0; border-radius: 7px; padding: 6px 10px; color: var(--ink-2); }
@@ -194,7 +193,7 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 .ticks { display: flex; gap: 6px; height: 48px; }
 .ticks i { flex: 1; min-width: 0; border-radius: 3px; background: var(--raised); }
 .ticks i.on { background: linear-gradient(180deg, #76c2bf, #1f9fb3); }
-.ticks i.pace { box-shadow: 0 0 0 1px var(--ink); }
+.ticks i { position: relative; }
 .ticks.warn i.on { background: var(--warn); }
 .ticks.bad i.on { background: var(--bad); }
 .limit { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; padding: 7px 12px; border-radius: 4px; background: var(--field); font-size: 13.5px; color: var(--ink-2); }
@@ -215,46 +214,24 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 .tapstat .k { display: flex; gap: 6px; }
 .tapstat .k > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tapstat .tapk { margin-left: auto; color: var(--muted); white-space: nowrap; }
-.up { color: var(--bad); } .down { color: var(--good); }
+.up { color: var(--bad); } .down { color: var(--good); } .warned { color: var(--warn); }
 
 /* calendar */
-#v-analytics .grid { flex: 1 1 0; min-height: 430px; grid-template-rows: minmax(0, 1fr); }
-#calcard, #merchcard { display: flex; flex-direction: column; min-height: 0; }
-#cal { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-#merch { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: none; }
-.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; flex: 1; min-height: 0; grid-template-rows: auto; grid-auto-rows: minmax(46px, 1fr); }
-@media (max-width: 520px) { .cal { gap: 4px; } .cal .day { padding: 4px 5px; min-height: 0; height: 46px; aspect-ratio: auto; border-radius: 7px; } .cal .day .amt { font-size: 10.5px; } .legend span { display: none; } }
-.cal .dow { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
-.day { min-width: 0; overflow: hidden; border-radius: 9px; background: var(--heat-0); border: 0; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; position: relative; min-height: 46px; }
-.day .n { font-size: 11px; color: var(--muted); }
-.day .amt { font-size: 12px; font-weight: 600; }
 .day.l3 .n, .day.l4 .n, .day.l5 .n { color: rgba(255,255,255,.75); }
 .day.l4 .amt, .day.l5 .amt { color: #fff; }
 :root[data-theme="dark"] .day.l5 .n, :root[data-theme="dark"] .day.l5 .amt { color: var(--heat-top); }
 .day.future { background: transparent; outline: 1px dashed var(--grid); outline-offset: -1px; cursor: default; }
 .day.blank { visibility: hidden; }
-.day.today::after { content: ""; position: absolute; right: 6px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.day.today { box-shadow: inset 0 0 0 1.5px var(--ink); }
 .day.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
 .day:not(.future):hover { filter: brightness(1.08); }
-.legend { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); margin-top: 12px; }
+.legend { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted); }
 .legend i { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
 
 /* categories */
-.cat-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 8px 6px; border-radius: 10px; cursor: pointer; border: 0; background: none; width: 100%; text-align: left; }
-.cat-row:hover, .cat-row.active { background: var(--surface-2); }
-.cat-name { display: flex; align-items: center; gap: 8px; font-weight: 400; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; display: inline-block; }
 .cat-val { text-align: right; font-weight: 500; }
 .cat-val small { color: var(--muted); font-weight: 400; }
-.bar { grid-column: 1 / -1; height: 6px; background: var(--surface-2); border-radius: 3px; position: relative; }
-.cat-row:hover .bar, .cat-row.active .bar { background: var(--frame); }
-.bar > div { height: 100%; border-radius: 0 3px 3px 0; }
-.bar .budget { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink-2); }
-.cat-meta { grid-column: 1 / -1; font-size: 12px; color: var(--muted); display: flex; gap: 4px 10px; flex-wrap: wrap; }
-.cat-meta span { white-space: nowrap; }
-.cat-meta .over { color: var(--bad); }
-.cat-meta .ahead { color: var(--warn); }
-.bar .pace { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink-2); opacity: .55; }
 .bud-sum { font-size: 12px; color: var(--muted); margin: 0 6px 6px; }
 .bud-edit { display: grid; grid-template-columns: 1fr auto 96px; gap: 4px 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .bud-edit:last-child { border-bottom: 0; }
@@ -324,6 +301,7 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 .more3:hover { color: var(--ink); background: var(--raised); }
 .tfoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; min-height: 54px; background: transparent; border-top: 1px solid var(--grid); color: var(--muted); font-size: 14px; flex-wrap: wrap; }
 .pager { display: flex; align-items: center; gap: 12px; color: var(--ink-3); }
+.pager[hidden] { display: none; }
 .pager button { width: 32px; height: 32px; border: 0; border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink-2); padding: 0; display: grid; place-items: center; }
 .pager button:hover:not(:disabled) { background: var(--raised); color: var(--ink); }
 .pager button:disabled { opacity: .45; cursor: default; }
@@ -392,7 +370,11 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 @media (max-width: 520px) { .shadd { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
 .actions .left { margin-right: auto; }
-.cat-edit { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; padding: 6px 0; }
+.cat-edit { display: grid; grid-template-columns: 24px minmax(0, 1fr) 72px 72px 28px; gap: 10px; align-items: center; padding: 2px 0; font-size: 13px; color: var(--ink-3); }
+.cat-edit > .num { text-align: right; }
+.cat-edit .cdel { padding: 2px 6px; color: var(--muted); }
+.cat-edit.head { font-size: 12px; color: var(--muted); padding-bottom: 2px; }
+.cat-edit.head span:nth-child(3), .cat-edit.head span:nth-child(4) { text-align: right; }
 .cat-edit input { background: var(--field); border: 1px solid transparent; border-radius: 8px; padding: 6px 8px; width: 100%; min-width: 0; }
 .swatch { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line); padding: 0; }
 .swatches { display: flex; gap: 6px; flex-wrap: wrap; padding: 6px; }
@@ -408,6 +390,309 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 .login p { color: var(--muted); margin: 0 0 16px; }
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--page); padding: 9px 14px; border-radius: 10px; z-index: 60; font-size: 13px; }
 .skeleton { color: var(--muted); padding: 40px 0; text-align: center; }
+
+
+/* ---------- shared page components, built from the Dashboard's stat cards ---------- */
+.lift { background: linear-gradient(180deg, var(--surface-3), var(--surface) 62%); box-shadow: inset 0 1px 0 var(--edge); }
+.ribbon { flex: none; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); border-radius: var(--r-lg); border: 1px solid var(--line); overflow: hidden; background: linear-gradient(180deg, var(--surface-3), var(--surface-2)); box-shadow: inset 0 1px 0 var(--edge); }
+.rb { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; min-width: 0; text-align: left; background: none; border: 0; border-left: 1px solid var(--line); color: var(--ink); }
+.rb:first-child { border-left: 0; }
+button.rb { cursor: pointer; }
+button.rb:hover { background: var(--raised); }
+.rb.on { box-shadow: inset 0 -2px 0 var(--accent); }
+.rb .k { display: flex; justify-content: space-between; gap: 6px; color: var(--ink-3); font-size: 12.5px; white-space: nowrap; }
+.rb .k em { font-style: normal; color: var(--muted); }
+.rb .v { font-size: 21px; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rb .d { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.note-h { font-size: 12px; color: var(--muted); }
+.legendrow { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-3); margin-top: 8px; }
+.legendrow span { display: inline-flex; align-items: center; gap: 6px; }
+.donut { position: relative; flex: none; }
+.donut svg { display: block; width: 100%; height: 100%; }
+.dc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.dc b { font-size: 20px; font-weight: 600; letter-spacing: -.01em; line-height: 1.15; }
+.dc small { font-size: 11.5px; color: var(--muted); }
+.tag { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; background: var(--raised); color: var(--ink-3); border: 1px solid var(--line); }
+.tag.good { background: var(--good-bg); color: var(--good-ink); } .tag.bad { background: var(--bad-bg); color: var(--bad-ink); } .tag.warn { background: var(--warn-bg); color: var(--warn-ink); }
+.dtile { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; border-radius: 9px; border: 1px solid var(--edge); background: linear-gradient(180deg, var(--tile-a), var(--tile-b)); line-height: 1.05; }
+.dtile small { font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .03em; }
+.dtile b { font-size: 15px; font-weight: 600; }
+.chart text, .stack-chart text, .plain-chart text { fill: var(--ink-3); font-size: 12px; font-family: var(--font); }
+
+/* analytics */
+#v-analytics .an-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); flex: 1 1 0; min-height: 640px; grid-template-rows: minmax(236px, .85fr) minmax(344px, 1fr); }
+#v-analytics .an-grid > * { display: flex; flex-direction: column; min-height: 0; }
+#ancat { grid-column: span 8; } #anmix { grid-column: span 4; }
+#calcard { grid-column: span 5; } #merchcard { grid-column: span 4; } #anmove { grid-column: span 3; }
+.stack-chart { position: relative; flex: 1; min-height: 130px; }
+.stack-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stack-chart text.cur { fill: var(--ink); font-weight: 600; }
+.sbar { cursor: pointer; }
+.sbar.dim rect:not([fill="transparent"]) { opacity: .8; }
+.sbar:hover rect:not([fill="transparent"]) { opacity: 1; }
+.mix { display: flex; align-items: center; gap: 16px; flex: 1; min-height: 0; }
+.mix-l { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.mix-r { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; background: none; border: 0; padding: 3px 6px; border-radius: 6px; font-size: 13px; color: var(--ink-2); text-align: left; }
+.mix-r:not(:disabled):hover { background: var(--raised); }
+.mix-r:disabled { cursor: default; color: var(--muted); }
+.mix-r span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mix-r b { font-weight: 500; color: var(--ink); }
+.needs { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.needs-h { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); margin-bottom: 6px; }
+.needs-h b { color: var(--ink); font-weight: 500; }
+.splitbar { display: flex; gap: 2px; height: 8px; border-radius: 4px; overflow: hidden; background: var(--raised); }
+.splitbar i { display: block; height: 100%; }
+#calcard h2 .right { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+#cal { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)) 48px; gap: 3px; }
+.cal:first-child { flex: 1; min-height: 0; grid-template-rows: auto; grid-auto-rows: minmax(30px, 1fr); }
+.cal .dow { font-size: 11px; color: var(--muted); text-align: center; }
+.cal .dow.wk, .wk-total { text-align: right; }
+.wk-total { align-self: center; font-size: 12px; color: var(--ink-2); padding-right: 2px; }
+.wk-note { font-size: 11px; color: var(--muted); align-self: end; }
+.day { min-width: 0; overflow: hidden; border-radius: 6px; background: var(--heat-0); border: 0; padding: 3px 5px; display: flex; align-items: flex-start; justify-content: space-between; gap: 2px; flex-wrap: wrap; align-content: space-between; text-align: left; position: relative; min-height: 0; }
+.day .n { font-size: 10px; line-height: 1.1; color: var(--muted); }
+.day .amt { font-size: 11px; line-height: 1.1; font-weight: 600; margin-left: auto; }
+.dowbars { height: 34px; flex: none; }
+.dowbar { display: flex; align-items: flex-end; height: 34px; border-bottom: 1px solid var(--axis); }
+.dowbar i { display: block; width: 100%; border-radius: 3px 3px 0 0; background: var(--heat-2); }
+.dowbar.peak i { background: var(--accent); }
+.legend { margin-top: 2px; }
+#merch { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; justify-content: space-between; }
+.rank { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 8px; align-items: center; width: 100%; background: none; border: 0; padding: 4px 6px; border-radius: 8px; text-align: left; color: var(--ink); }
+.rank:hover { background: var(--raised); }
+.rk { font-size: 12px; color: var(--muted); text-align: right; }
+.rname { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.rname b { font-weight: 400; font-size: 13.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rbar { height: 4px; border-radius: 2px; background: var(--raised); overflow: hidden; }
+.rbar i { display: block; height: 100%; border-radius: 2px; }
+.rval { text-align: right; font-size: 13.5px; font-weight: 500; }
+.rval small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+#anmove { gap: 0; }
+.move { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--line); flex: 1; align-content: center; }
+.move:last-child { border-bottom: 0; }
+.mname { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mval { font-size: 12.5px; font-weight: 500; }
+.mbar { grid-column: 1 / -1; grid-row: 2; position: relative; height: 6px; border-radius: 3px; background: var(--surface-2); }
+.mbar::before { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.mbar i { position: absolute; top: 0; bottom: 0; }
+.mbar i.more { left: 50%; background: var(--bad); border-radius: 0 3px 3px 0; }
+.mbar i.less { right: 50%; background: var(--good); border-radius: 3px 0 0 3px; }
+
+
+/* transactions */
+.tx-layout { flex: 1 1 0; min-height: 420px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--gap); }
+.tx-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.tx-rail { flex: none; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tx-rail .seg2 { margin: 0; flex: none; }
+.rail-cats { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); padding-right: 28px; }
+.cchip { --c: var(--accent); flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); font-size: 12.5px; }
+.cchip b { font-weight: 500; color: var(--muted); }
+.cchip:hover { background: var(--raised); }
+.cchip.on { background: color-mix(in srgb, var(--c) 18%, var(--surface)); border-color: color-mix(in srgb, var(--c) 55%, transparent); color: var(--ink); }
+.cchip.on b { color: var(--ink-2); }
+#v-transactions #filter { display: none; }
+#v-transactions #txcard { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+#v-transactions .tx-h h2::after { content: none; }
+.pill { --c: var(--muted); padding: 3px 8px 3px 7px; border-radius: 6px; background: color-mix(in srgb, var(--c) 14%, transparent); }
+.pill:hover { background: color-mix(in srgb, var(--c) 24%, transparent); }
+.tr[data-id] { cursor: default; transition: background-color .12s; }
+#v-transactions .tr[data-id] { cursor: pointer; }
+#v-transactions .tr[data-id]:hover { background: var(--surface-2); }
+#v-transactions .tr.cur { background: var(--surface-2); box-shadow: inset 2px 0 0 var(--accent); }
+.tr .srcdot { position: relative; }
+.card.inspector { display: flex; flex-direction: column; min-height: 0; overflow: hidden auto; overscroll-behavior: contain; padding: 0; }
+#v-transactions .tr { grid-template-columns: 30px 112px minmax(0, 1fr) 150px 92px 78px 76px 30px; gap: 8px; padding: 0 10px 0 12px; }
+.ins-top { padding: 16px; border-bottom: 1px solid var(--line); background: radial-gradient(80% 110px at 100% 0, color-mix(in srgb, var(--c) 24%, transparent), transparent); }
+.ins-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ins-logo { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-weight: 600; color: #fff; flex: none; }
+.ins-who b { display: block; font-weight: 500; font-size: 15px; line-height: 1.25; overflow-wrap: anywhere; }
+.ins-who small { display: block; font-size: 12px; color: var(--ink-3); }
+.ins-amt { font-size: 27px; font-weight: 600; letter-spacing: -.01em; margin-top: 14px; line-height: 1.1; }
+.ins-sub { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.ins-body { padding: 4px 16px 8px; }
+.ins-hist { padding: 8px 16px 12px; flex: 1; border-top: 1px solid var(--line); }
+.ins-hist h3 { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 400; color: var(--ink-3); margin: 0 0 6px; }
+.ins-hist h3 b { color: var(--ink); font-weight: 500; }
+.hrow { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--ink-3); padding: 3px 0; }
+.hrow.me { color: var(--ink); }
+.dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 12px; align-items: center; min-height: 36px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.dl:last-child { border-bottom: 0; }
+.dl > span:first-child { color: var(--muted); }
+.dl > :last-child { justify-self: end; text-align: right; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+.ins-need { display: flex; gap: 2px; padding: 2px; border-radius: 7px; background: var(--surface-2); }
+.ins-need button { border: 0; background: none; color: var(--muted); padding: 2px 10px; border-radius: 5px; font-size: 12.5px; }
+.ins-need button.on { background: var(--raised); color: var(--ink); }
+.ins-foot { padding: 12px 16px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+.ins-foot .btn { flex: 1; justify-content: center; }
+.conf { display: inline-flex; align-items: center; gap: 6px; }
+.conf i { display: block; width: 56px; height: 4px; border-radius: 2px; background: var(--raised); overflow: hidden; }
+.conf i u { display: block; height: 100%; background: var(--accent); }
+.ins-empty { padding: 32px 16px; text-align: center; color: var(--muted); }
+.ins-many { padding: 16px; }
+.ins-many .v { font-size: 27px; font-weight: 600; letter-spacing: -.01em; }
+
+
+/* budgets */
+.bud-hero { display: grid; grid-template-columns: auto minmax(200px, .8fr) minmax(0, 1.5fr); gap: 28px; align-items: center; padding: 16px 20px; }
+.bh-big { font-size: 34px; font-weight: 600; letter-spacing: -.015em; line-height: 1.1; margin: 2px 0 12px; }
+.bh-stats { display: flex; gap: 24px; }
+.bh-stats div { display: flex; flex-direction: column; }
+.bh-stats span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.bh-stats b { font-size: 15px; font-weight: 500; }
+.bh-alloc { min-width: 0; padding-left: 28px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.bh-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.allocbar { display: flex; gap: 3px; height: 26px; }
+.aseg { position: relative; min-width: 3px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--c) 22%, var(--surface-2)); }
+.aseg i { display: block; height: 100%; background: var(--c); }
+.aseg.free { background: repeating-linear-gradient(135deg, var(--raised) 0 4px, transparent 4px 8px); }
+.bh-foot { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted); }
+.bh-count { display: flex; gap: 6px; flex-wrap: wrap; }
+#catcard { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+#cats { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: var(--gap); }
+.bud-left { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; }
+.bud-left .bud-col:first-child { flex: 0 1 auto; }
+.bud-left .bud-free { flex: 1 1 0; }
+.bud-col { display: flex; flex-direction: column; min-height: 0; }
+.bud-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; }
+.bud-list.two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(84px, 1fr); gap: 8px; }
+.bud-list.two-up .cat-row { justify-content: space-between; }
+.bud-clear { padding: 16px; color: var(--muted); text-align: center; }
+.cat-row > * { width: 100%; }
+.cat-row.plain > * { width: auto; }
+.cat-row { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: var(--r-md); cursor: pointer; border: 1px solid var(--line); background: var(--surface-2); width: 100%; text-align: left; color: var(--ink); }
+.cat-row:hover, .cat-row.active { background: var(--raised); }
+.cat-row.over { background: linear-gradient(180deg, color-mix(in srgb, var(--bad) 9%, var(--surface-2)), var(--surface-2)); border-color: color-mix(in srgb, var(--bad) 28%, transparent); }
+.cat-row.ahead { border-color: color-mix(in srgb, var(--warn) 24%, transparent); }
+.cr-top, .cr-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.cr-foot .note { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cat-name { display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.cat-val { white-space: nowrap; }
+.seglets { display: flex; gap: 2px; height: 14px; }
+.seglets i { flex: 1; min-width: 0; border-radius: 2px; background: var(--raised); }
+.seglets i.on { background: var(--c); }
+.seglets i { position: relative; }
+.seglets i.pace::after, .ticks i.pace::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--ink); }
+.cat-row:hover .seglets i:not(.on) { background: var(--axis); }
+.free-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; }
+.cat-row.plain { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 8px; padding: 6px 8px; background: none; border: 0; }
+.cat-row.plain:hover { background: var(--raised); }
+.cat-row.plain .rbar, .cat-row.plain .note { grid-column: 1 / -1; }
+
+/* accounts */
+#acccard { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; flex: 1 1 auto; }
+.nw-hero { flex: 1 1 auto; max-height: 400px; min-height: 240px; display: grid; grid-template-columns: minmax(280px, .36fr) minmax(0, 1fr); gap: 24px; padding: 16px 20px; background: radial-gradient(50% 180px at 100% 0, var(--glow), transparent), linear-gradient(180deg, var(--surface-3), var(--surface) 62%); border-top-color: var(--glow-edge); }
+.nw-side { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+.nw-label { display: flex; align-items: center; gap: 2px; font-size: 13px; color: var(--ink-3); }
+.nw-big { font-size: 34px; font-weight: 600; letter-spacing: -.015em; line-height: 1.1; }
+.nw-compo { width: 100%; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.nw-line { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); margin-top: 4px; }
+.nw-line b { font-weight: 500; color: var(--ink); }
+.compo { display: flex; gap: 2px; height: 8px; border-radius: 4px; background: var(--raised); overflow: hidden; }
+.cseg { display: block; min-width: 2px; background: var(--t); }
+.nw-main { min-width: 0; display: flex; flex-direction: column; gap: 6px; padding-left: 24px; border-left: 1px solid var(--line); }
+.nw-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.nw-btns { display: flex; gap: 8px; }
+.plain-chart { position: relative; flex: 1; min-height: 150px; }
+.plain-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.nw-hint { margin: 0; text-align: right; }
+.ac-group h2 { font-size: 14px; font-weight: 400; color: var(--ink-3); display: flex; justify-content: space-between; margin: 0 0 8px; }
+.ac-group h2 span { color: var(--ink); font-weight: 500; }
+.ac-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap); }
+.ac-group { flex: none; }
+.acard { --t: var(--accent); position: relative; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-radius: var(--r-lg); border: 1px solid var(--edge); overflow: hidden; background: radial-gradient(70% 110px at 100% 0, color-mix(in srgb, var(--t) 30%, transparent), transparent), linear-gradient(115deg, var(--face-a), var(--face-b)); }
+.acard.closed { opacity: .5; }
+.ac-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ac-top .tile { color: var(--t); }
+.ac-name { min-width: 0; }
+.ac-name b { display: block; font-weight: 500; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-name small { display: block; font-size: 12px; color: var(--ink-3); }
+.ac-bal { background: none; border: 0; padding: 0; text-align: left; color: var(--ink); font-size: 25px; font-weight: 600; letter-spacing: -.01em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-bal:hover { color: var(--accent); }
+.ac-foot { display: flex; gap: 6px; flex-wrap: wrap; }
+
+
+/* recurring */
+#reccard { display: flex; flex-direction: column; gap: var(--gap); flex: 1 1 auto; min-height: 0; }
+.rec-rail { flex: none; }
+.rec-rail .chart-h { margin-bottom: 26px; }
+.rec-rail .chart-h h2 { margin: 0; }
+.dot.hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.rail { position: relative; height: 54px; margin: 0 8px; }
+.rail-line { position: absolute; left: 0; right: 0; top: 26px; height: 3px; border-radius: 2px; background: var(--raised); }
+.rail-line i { display: block; height: 100%; border-radius: 2px; background: var(--accent); opacity: .55; }
+.rnow { position: absolute; top: -8px; bottom: -2px; width: 1px; background: var(--ink); }
+.rnow em { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 10.5px; color: var(--ink-2); white-space: nowrap; }
+.rm { position: absolute; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--c); border: 2px solid var(--surface); cursor: default; }
+.rm.income { top: 7px; } .rm.spend { top: 34px; }
+.rm.spend { background: var(--c); }
+.rm.done { background: var(--surface); box-shadow: inset 0 0 0 2px var(--c); opacity: .85; }
+.rail-days { position: relative; height: 16px; margin: 2px 8px 0; font-size: 11px; color: var(--muted); }
+.rail-days span { position: absolute; transform: translateX(-50%); }
+.rec-cols { flex: 1 1 0; min-height: 280px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--gap); }
+.rc { display: flex; flex-direction: column; min-height: 0; }
+.rc-b { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; }
+.uline { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.uline:last-child { border-bottom: 0; }
+.um { min-width: 0; display: block; }
+.um b { font-weight: 400; display: flex; align-items: center; gap: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+.um small { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-h { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); padding: 8px 4px 4px; border-bottom: 1px solid var(--line); }
+.sc-h b { font-weight: 500; color: var(--ink-2); }
+.sline { display: grid; grid-template-columns: auto minmax(0, 1fr) 64px auto 28px; gap: 10px; align-items: center; padding: 7px 4px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.sline.paused { opacity: .55; }
+.commit { display: flex; align-items: center; gap: 16px; padding: 0 4px 10px; }
+.commit > div:last-child { flex: 1; min-width: 0; }
+.commit-v { font-size: 18px; font-weight: 600; margin: 2px 0 6px; }
+.commit-v small { font-size: 12.5px; font-weight: 400; color: var(--muted); }
+.commit .dc b { font-size: 15px; } .commit .dc small { font-size: 10px; }
+.sshare { height: 4px; border-radius: 2px; background: var(--raised); overflow: hidden; }
+.sshare u { display: block; height: 100%; }
+
+/* income */
+.inc-grid { flex: 1 1 0; min-height: 520px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 34%); gap: var(--gap); }
+.inc-l, .inc-r { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; min-width: 0; }
+#incchart { flex: 1 1 0; min-height: 230px; display: flex; flex-direction: column; }
+#incchart .chart-h { margin-bottom: 4px; }
+#incchart .plain-chart text.cur { fill: var(--ink); font-weight: 600; }
+.plain-chart text.cur { fill: var(--ink); font-weight: 600; }
+#flowcard { flex: 1 1 0; min-height: 210px; display: flex; flex-direction: column; }
+#flowcard h2 .right { margin-left: auto; }
+.ledger { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+#incsrc { flex: none; }
+#incsrc .dc b { font-size: 16px; }
+#incsrc .dc small { font-size: 10.5px; }
+.src-top { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.src-l { width: 100%; min-width: 0; display: flex; flex-direction: column; }
+.src { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.src:last-child { border-bottom: 0; }
+.src > span:last-child { text-align: right; font-weight: 500; white-space: nowrap; }
+.src small { display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; }
+#owedcard { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+
+/* settings */
+.set-grid { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gap); }
+.set-cats { display: flex; flex-direction: column; min-height: 0; }
+.set-h { display: flex; justify-content: space-between; gap: 12px; }
+.set-h h2, .set-t h2 { margin: 0; }
+.set-h p, .set-t p { margin: 2px 0 0; }
+#ced { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; justify-content: space-between; gap: 2px; margin-top: 8px; }
+.cat-edit input { background: var(--field); border: 1px solid var(--line); }
+.cat-edit input:focus { border-color: var(--axis); outline: none; }
+.cat-edit input:disabled { opacity: .55; }
+.set-add { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.set-add input { flex: 1; min-width: 0; height: 34px; background: var(--field); border: 1px solid var(--line); border-radius: var(--r-md); padding: 0 12px; outline: none; }
+.set-side { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.set-seg { margin: 0; }
+.pick.wide { max-width: 220px; min-width: 160px; }
+.set-block { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.set-block .set-t { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.set-block p { margin: 0; line-height: 1.45; }
+
+/* modals follow the same surfaces */
+.modal { background: linear-gradient(180deg, var(--surface-3), var(--surface) 140px); box-shadow: inset 0 1px 0 var(--edge), 0 24px 60px rgba(0,0,0,.45); }
+.login { background: linear-gradient(180deg, var(--surface-3), var(--surface)); box-shadow: inset 0 1px 0 var(--edge); }
 
 /* short windows: everything tightens so the Dashboard tab still fits without scrolling */
 @media (max-height: 1120px) and (min-width: 901px) {
@@ -438,6 +723,28 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
   .ticks { height: 26px; }
   .limit { margin-top: 8px; padding: 4px 10px; font-size: 13px; }
   .tx-h { margin-bottom: 8px; }
+  .rec-rail .chart-h { margin-bottom: 12px; }
+  .uline { padding: 4px; } .sline { padding: 4px; }
+  .dtile { width: 34px; height: 34px; } .dtile b { font-size: 13.5px; }
+  .uline { grid-template-columns: 34px minmax(0, 1fr) auto auto; }
+  .src-top { flex-direction: row; align-items: center; }
+  .bud-hero, .nw-hero { padding: 10px 16px; }
+  .bud-hero .donut { width: 128px !important; height: 128px !important; }
+  .bud-hero .dc b { font-size: 17px; }
+  .bh-big, .nw-big { font-size: 28px; margin-bottom: 6px; }
+  .bh-alloc { gap: 6px; }
+  .cat-row { padding: 7px 10px; gap: 5px; }
+  .seglets { height: 10px; }
+  #v-analytics .an-grid { min-height: 590px; grid-template-rows: minmax(226px, .8fr) minmax(300px, 1fr); }
+  .mix { gap: 10px; }
+  .mix .donut { width: 112px !important; height: 112px !important; }
+  .mix .dc b { font-size: 15px; } .mix .dc small { font-size: 10px; }
+  .mix-r { font-size: 12px; padding: 0 4px; }
+  .needs { margin-top: 4px; padding-top: 4px; } .needs-h { margin-bottom: 3px; font-size: 12px; }
+  #anmix h2 { margin-bottom: 6px; }
+  .rank { padding: 2px 6px; } .rname { gap: 2px; } .rname b { font-size: 13px; } .rval { font-size: 13px; line-height: 1.2; }
+  .move { padding: 2px 0; }
+  .rb { padding: 8px 14px; } .rb .v { font-size: 19px; }
   .view > #txcard { min-height: 200px; }
   .tr { min-height: 44px; }
   .tr.th { min-height: 30px; font-size: 13px; }
@@ -447,7 +754,11 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 @media (max-height: 700px) and (min-width: 901px) { .promo { display: none; } .tr .m small { display: none; } }
 @media (max-width: 1240px) { .over { grid-template-columns: minmax(0, 1fr) minmax(280px, 34%); } .kpi-v { font-size: 21px; } .kpi-h { font-size: 13px; } .tile { display: none; } .tr { grid-template-columns: 36px minmax(0, 1.7fr) minmax(0, 1fr) 96px 84px 84px 36px; } .c-id { display: none; } }
 @media (max-width: 1000px) { .tr { grid-template-columns: 36px minmax(0, 1.7fr) minmax(0, 1fr) 84px 84px 36px; } .c-date { display: none; } }
+@media (max-width: 1240px) { .bud-hero { grid-template-columns: auto minmax(0, 1fr); } .bh-alloc { grid-column: 1 / -1; padding-left: 0; border-left: 0; } .bud-list.two-up { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1560px) { #v-transactions .tr { grid-template-columns: 30px minmax(0, 1fr) 150px 92px 78px 76px 30px; } #v-transactions .c-id { display: none; } }
+@media (max-width: 1400px) { #v-transactions .tr { grid-template-columns: 30px minmax(0, 1fr) 142px 92px 78px 30px; } #v-transactions .c-stat { display: none; } }  /* the inspector shows status */
 @media (max-width: 1000px) { .over { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1100px) { .tx-layout { grid-template-columns: minmax(0, 1fr); flex: none; } #v-transactions #txcard { flex: none; } .inspector { overflow: visible; } }
 @media (max-width: 900px) {
   /* phones: brand and month on one line, tabs in one sideways strip, the tab's content scrolls below */
   .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
@@ -465,9 +776,36 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
   .top { padding: 12px 16px 0; }
   .view { padding: 12px 16px 16px; }
   .view > #txcard { flex: none; }
-  #v-analytics .grid { flex: none; grid-template-rows: none; }
-  #merch { overflow: visible; }
-  .cal { flex: none; }
+  #v-dashboard .tbody { max-height: 60vh; }
+  #v-analytics .an-grid { flex: none; grid-template-rows: none; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  #v-analytics .an-grid > * { grid-column: 1 / -1; }
+  .stack-chart { height: 200px; flex: none; }
+  #merch { overflow: visible; gap: 6px; }
+  .cal:first-child { flex: none; grid-auto-rows: 42px; }
+  .bud-hero, .nw-hero { grid-template-columns: minmax(0, 1fr); gap: 16px; justify-items: stretch; }
+  .bud-hero .bh-ring { justify-self: center; }
+  .bh-alloc, .nw-main { padding-left: 0; border-left: 0; }
+  #cats { grid-template-columns: minmax(0, 1fr); }
+  .bud-list, .free-list { overflow: visible; }
+  #reccard, #acccard, #cats, #catcard, .rc { flex: none; }
+  .bud-left .bud-col, .bud-left .bud-free { flex: none; }
+  .nw-hero { flex: none; max-height: none; }
+  .plain-chart { flex: none; height: 190px; }
+  .bud-list.two-up { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
+  #v-transactions .tr { grid-template-columns: minmax(0, 1fr) auto auto; gap: 2px 10px; padding: 10px 12px; }
+  #v-transactions .c-stat { display: block; }
+  #txcard .tbl .tr:not(.th) { max-height: none; }
+  .tx-rail { flex-wrap: wrap; }
+  .rb:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .rec-cols, .inc-grid, .set-grid { flex: none; grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  #ced { overflow: visible; }
+  .cat-edit { grid-template-columns: 24px minmax(0, 1fr) 56px 28px; } .cat-edit > :nth-child(3) { display: none; }
+  .set-side, .rc-b, .ledger { overflow: visible; }
+  #incchart { flex: none; height: 260px; } #flowcard { flex: none; }
+  .set-row { flex-direction: column; align-items: flex-start; }
+  .ribbon { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rb:nth-child(odd) { border-left: 0; }
+  .rb { border-top: 1px solid var(--line); }
 }
 @media (max-width: 720px) {
   .top { flex-wrap: wrap; }
@@ -555,7 +893,7 @@ const S = {
   income: { items: [], count: 0, total: 0 }, accounts: { items: [] }, networth: null,
   hideNW: store.get("spend_hide_nw") === "1",  // per-device: net worth shown as dots
   hideAll: store.get("spend_hide_all") === "1",  // per-device: every amount shown as dots
-  day: null, category: null, q: "", tx: { items: [], count: 0, total: 0 }, offset: 0, txPage: 10, view: "dashboard",
+  day: null, category: null, q: "", tx: { items: [], count: 0, total: 0 }, offset: 0, txPage: 10, view: "dashboard", hist: {},
 };
 
 // ---------- login ----------
@@ -585,7 +923,7 @@ function renderShell() {
         <nav>${nav}</nav>
         <div class="side-end">
           <div class="nav-label">SUPPORT</div>
-          <button class="nav-item" id="settings">${ICON.gear}Settings</button>
+          <button class="nav-item" data-view="settings">${ICON.gear}Settings</button>
           <button class="nav-item" id="hideall"></button>
           <div class="promo" id="promo"></div>
         </div>
@@ -610,34 +948,47 @@ function renderShell() {
         <section class="card" id="txcard"></section>
       </div>
       <div class="view" id="v-analytics">
-        <div class="stats" id="hero"></div>
-        <div class="grid">
-          <section class="card span-7" id="calcard"><h2>Daily spend <span class="right note" id="calnote"></span></h2><div id="cal"></div></section>
-          <section class="card span-5" id="merchcard"><h2>Top merchants</h2><div id="merch"></div></section>
+        <div class="ribbon" id="hero"></div>
+        <div class="an-grid">
+          <section class="card lift" id="ancat"></section>
+          <section class="card lift" id="anmix"></section>
+          <section class="card" id="calcard"><h2>Daily rhythm <span class="right note" id="calnote"></span></h2><div id="cal"></div></section>
+          <section class="card" id="merchcard"><h2>Top merchants</h2><div id="merch"></div></section>
+          <section class="card" id="anmove"></section>
         </div>
       </div>
-      <div class="view" id="v-transactions"></div>
-      <div class="view" id="v-budgets"><section class="card" id="catcard"><h2>Categories <span class="right note" id="catnote"></span><button class="ghost" id="budbtn" style="padding:2px 8px">Budgets</button></h2><div id="cats"></div></section></div>
-      <div class="view" id="v-accounts"><section class="card" id="acccard"></section></div>
-      <div class="view" id="v-recurring"><section class="card" id="reccard"><h2>Recurring <button class="ghost right" id="addrec" style="padding:2px 8px">+ Add</button></h2><div id="rec"></div></section></div>
-      <div class="view" id="v-income"><div class="two"><section class="card" id="flowcard"></section><section class="card" id="owedcard" hidden></section></div></div>
+      <div class="view" id="v-transactions">
+        <div class="ribbon" id="txstats"></div>
+        <div class="tx-layout">
+          <div class="tx-main" id="txslot"><div class="tx-rail" id="txrail"></div></div>
+          <aside class="card lift inspector" id="txinsp"></aside>
+        </div>
+      </div>
+      <div class="view" id="v-budgets"><section class="card lift bud-hero" id="budhero"></section><div id="catcard"><div id="cats"></div></div></div>
+      <div class="view" id="v-accounts"><div id="acccard"></div></div>
+      <div class="view" id="v-recurring"><div id="reccard"></div></div>
+      <div class="view" id="v-settings"></div>
+      <div class="view" id="v-income">
+        <div class="ribbon" id="incstats"></div>
+        <div class="inc-grid">
+          <div class="inc-l"><section class="card lift" id="incchart"></section><section class="card" id="flowcard"></section></div>
+          <div class="inc-r"><section class="card lift" id="incsrc"></section><section class="card" id="owedcard" hidden></section></div>
+        </div>
+      </div>
     </main>
   </div></div>`;
   $("#prev").onclick = () => setMonth(shiftYm(S.month, -1));
   $("#next").onclick = () => setMonth(shiftYm(S.month, 1));
-  $("#settings").onclick = openSettings;
   const hb = $("#hideall");
   const paintHide = () => { hb.innerHTML = (S.hideAll ? EYE_OFF : EYE) + (S.hideAll ? "Show amounts" : "Hide amounts"); };
   paintHide();
   hb.onclick = () => { S.hideAll = !S.hideAll; store.set("spend_hide_all", S.hideAll ? "1" : "0"); paintHide(); rerender(); };
-  $("#addrec").onclick = () => openRecModal();
-  $("#budbtn").onclick = () => openBudgets();
   $("#bell").onclick = () => {
     if (!S.stats?.review_count) return toast("Nothing to review");
     S.review = true; S.offset = 0; loadTx(); goTo("#txcard");
   };
   const paintTheme = () => { $("#tdark").classList.toggle("on", isDark()); $("#tlight").classList.toggle("on", !isDark()); };
-  const setTheme = (t) => { document.documentElement.dataset.theme = t; store.set("spend_theme", t); paintTheme(); rerender(); };
+  const setTheme = (t) => { document.documentElement.dataset.theme = t; store.set("spend_theme", t); paintTheme(); rerender(); if (S.view === "settings") renderSettings(); };
   paintTheme();
   $("#tdark").onclick = () => setTheme("dark");
   $("#tlight").onclick = () => setTheme("light");
@@ -647,15 +998,16 @@ function renderShell() {
   document.querySelectorAll("[data-view]").forEach((b) => b.onclick = () => { location.hash = b.dataset.view; });
   setView(viewFromHash());
 }
-const viewFromHash = () => { const v = location.hash.slice(1); return NAV.some((n) => n[1] === v) ? v : "dashboard"; };
+const viewFromHash = () => { const v = location.hash.slice(1); return v === "settings" || NAV.some((n) => n[1] === v) ? v : "dashboard"; };
 function setView(v) {
   S.view = v;
   document.querySelectorAll(".view").forEach((el) => el.classList.toggle("on", el.id === `v-${v}`));
   document.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
-  $("#vtitle").textContent = NAV.find((n) => n[1] === v)[0];
-  if (v === "dashboard" || v === "transactions") { $(`#v-${v}`).appendChild($("#txcard")); fitTx(); }
+  $("#vtitle").textContent = v === "settings" ? "Settings" : NAV.find((n) => n[1] === v)[0];
+  if (v === "dashboard" || v === "transactions") { (v === "transactions" ? $("#txslot") : $("#v-dashboard")).appendChild($("#txcard")); fitTx(); }
   $(`#v-${v}`).scrollTop = 0;
-  if (v === "dashboard") renderChart();  // it can't measure itself while hidden
+  rerender();  // charts can't measure themselves while hidden
+  if (v === "settings") renderSettings();
 }
 addEventListener("hashchange", () => { if ($("#vtitle")) setView(viewFromHash()); });
 // the tab that holds a card; opens it, or stays put when it's already showing
@@ -668,7 +1020,8 @@ function fitTx() {
   const card = $("#txcard"), tbl = card && $(".tbl", card);
   if (!tbl || !card.offsetParent) return;
   let n = 10;
-  if (innerWidth > 900) {
+  if (S.view === "dashboard") n = 500;  // the whole month, scrolled inside the table
+  else if (innerWidth > 1100) {
     const r = $(".tr:not(.th)", tbl), row = r ? parseFloat(getComputedStyle(r).minHeight) : 54;  // rows stretch, so use the smallest they can be
     const room = tbl.clientHeight - ($(".th", tbl)?.offsetHeight || 0) - ($(".tfoot", tbl)?.offsetHeight || 0);
     n = Math.max(2, Math.floor((room + 2) / row));
@@ -679,20 +1032,24 @@ function fitTx() {
 }
 
 // redraw from loaded data (no refetch), e.g. after toggling privacy mode
+function renderMonth() {
+  renderHero(); renderAlert(); renderCalendar(); renderMerchants(); renderMix(); renderMovers(); renderCats(); renderFlow(); renderKpis(); renderCards();
+  if (S.trend) { renderChart(); renderStack(); }
+}
 function rerender() {
   if (!S.stats) return;
-  renderHero(); renderAlert(); renderCalendar(); renderCats(); renderMerchants(); renderFlow(); renderTx();
-  if (S.trend) renderChart();
+  renderMonth(); renderTx();
   if (S.networth) renderAccounts();
   renderRecurring();
   renderOwed();
+  if (S.view === "settings" && !$("#v-settings").contains(document.activeElement)) renderSettings();
 }
 
 async function setMonth(ym) {
   S.month = ym; S.day = null; S.category = null; S.offset = 0;
   await loadMonth();
   if (S.month.slice(0, 4) !== S.trendYear) await Promise.all([loadTrend(), loadAccounts()]);
-  else { renderChart(); renderAccounts(); }
+  else { renderChart(); renderStack(); renderFlow(); renderAccounts(); }
 }
 
 // ---------- loading ----------
@@ -705,14 +1062,15 @@ async function boot() {
     renderShell();
     [S.cats, S.settings] = await Promise.all([api("/categories"), api("/settings")]);
     await Promise.all([loadAccounts(), loadRecurring(), loadShares()]);  // accounts first: income rows name them
-    await Promise.all([loadMonth(), loadTrend()]);
+    await Promise.all([loadMonth(), loadTrend(), loadBudgets()]);
+    if (S.view === "settings") renderSettings();
   } catch (e) { if (e.message !== "auth") console.error(e); }
 }
 const monthBounds = (ym) => { const [y, m] = ym.split("-"); return [`${ym}-01`, `${ym}-${String(new Date(+y, +m, 0).getDate()).padStart(2, "0")}`]; };
 async function loadMonth() {
   const [a, b] = monthBounds(S.month);
   [S.stats, S.income] = await Promise.all([api(`/stats/month?month=${S.month}`), api(`/income?start=${a}&end=${b}`)]);
-  renderHero(); renderAlert(); renderCalendar(); renderCats(); renderMerchants(); renderFlow(); renderKpis(); renderCards(); renderChart();
+  renderMonth();
   $("#next").disabled = S.month >= localToday().slice(0, 7);
   await loadTx();
 }
@@ -722,16 +1080,17 @@ async function loadAccounts() {  // net worth for Jan-Dec of the year being view
 }
 async function loadTrend() {  // Jan-Dec of the year being viewed
   const y = S.month.slice(0, 4);
-  S.trend = await api(`/stats/trend?months=12&end=${y}-12`);
+  [S.trend, S.incYear] = await Promise.all([api(`/stats/trend?months=12&end=${y}-12`), api(`/income?start=${y}-01-01&end=${y}-12-31`)]);
   S.trendYear = y;
-  renderChart();
+  renderChart(); renderStack(); if (S.stats) renderFlow();
 }
 async function loadRecurring() {
   S.recurring = await api("/recurring"); renderRecurring();
   // may ask the AI about new candidates, so don't hold up the rest of the dashboard
   api("/subscriptions/suggestions").then((s) => { S.subs = s; renderRecurring(); }).catch(() => {});
 }
-async function refreshAll() { S.cats = await api("/categories"); await Promise.all([loadMonth(), loadTrend(), loadRecurring(), loadAccounts(), loadShares()]); }
+async function refreshAll() { S.hist = {}; S.cats = await api("/categories"); loadBudgets(); await Promise.all([loadMonth(), loadTrend(), loadRecurring(), loadAccounts(), loadShares()]); }
+async function loadBudgets() { S.budgets = await api("/budgets"); if (S.stats) renderCats(); }
 async function loadShares() { S.shares = await api("/shares"); renderOwed(); }
 
 let txSeq = 0;
@@ -781,21 +1140,50 @@ const monthPace = (s) => {
   return { dim, elapsed };
 };
 
+// ---------- shared page pieces ----------
+const ribbon = (cells) => cells.map((c) => `<${c.id ? `button id="${c.id}"` : "div"} class="rb ${c.cls || ""}" ${c.title ? `title="${esc(c.title)}"` : ""}>
+    <span class="k">${c.k}${c.tap ? `<em>${c.tap}</em>` : ""}</span><span class="v num ${c.tone || ""}">${c.v}</span><span class="d num">${c.d ?? ""}</span></${c.id ? "button" : "div"}>`).join("");
+const dateTile = (iso) => `<span class="dtile"><small>${fmtDay(iso, { month: "short" })}</small><b class="num">${+iso.slice(8)}</b></span>`;
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+// one ring per segment, drawn as dashes round the same circle
+function donut(segs, big, small, size = 148) {
+  const r = size / 2 - 11, C = 2 * Math.PI * r, sum = segs.reduce((a, x) => a + x.v, 0) || 1;
+  let off = 0;
+  const arcs = segs.map((x) => {
+    const len = (x.v / sum) * C, gap = segs.length > 1 ? Math.min(3, len / 3) : 0;
+    const a = `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${x.color}" stroke-width="15" stroke-dasharray="${Math.max(0.5, len - gap)} ${C}" stroke-dashoffset="${-off}"/>`;
+    off += len; return a;
+  }).join("");
+  return `<div class="donut" style="width:${size}px;height:${size}px"><svg viewBox="0 0 ${size} ${size}"><g transform="rotate(-90 ${size / 2} ${size / 2})"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="15"/>${arcs}</g></svg>
+    <div class="dc"><b class="num">${big}</b><small>${small}</small></div></div>`;
+}
+function gauge(pct, color, paceAt, big, small, size = 164) {
+  const r = size / 2 - 12, C = 2 * Math.PI * r, arc = C * 0.75;
+  const pace = paceAt == null ? "" : (() => {
+    const a = (135 + paceAt * 270) * (Math.PI / 180), c = size / 2;
+    return `<line x1="${c + (r - 11) * Math.cos(a)}" y1="${c + (r - 11) * Math.sin(a)}" x2="${c + (r + 11) * Math.cos(a)}" y2="${c + (r + 11) * Math.sin(a)}" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>`;
+  })();
+  return `<div class="donut" style="width:${size}px;height:${size}px" title="Marker = even pace"><svg viewBox="0 0 ${size} ${size}"><g transform="rotate(135 ${size / 2} ${size / 2})">
+      <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--raised)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${arc} ${C}"/>
+      <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="13" stroke-linecap="round" stroke-dasharray="${Math.max(0.01, (pct100(pct) / 100) * arc)} ${C}"/></g>${pace}</svg>
+    <div class="dc"><b class="num">${big}</b><small>${small}</small></div></div>`;
+}
+
 // ---------- month stats ----------
 function renderHero() {
   const s = S.stats;
   $("#mlabel").textContent = s.label;
   const b = s.budget;
   const { elapsed } = monthPace(s);
-  const tone = !b ? "var(--accent)" : s.total > b ? "var(--bad)" : (s.projected || s.total) > b ? "var(--warn)" : "var(--good)";
-  const delta = s.total - s.prev_same_point;
-  $("#hero").innerHTML = `
-      <div class="stat"><div class="k">Daily average</div><div class="v num">${money(s.daily_avg)}</div><div class="d">${elapsed} day${elapsed === 1 ? "" : "s"}</div></div>
-      <div class="stat"><div class="k">${s.is_current ? "Projected" : "Month total"}</div><div class="v num" style="color:${s.is_current ? tone : "inherit"}">${money(s.projected ?? s.total, true)}</div><div class="d">${s.is_current ? "at current pace" : "final"}</div></div>
-      <div class="stat"><div class="k">vs ${esc(s.prev_label)}</div><div class="v num ${delta > 0 ? "up" : "down"}">${s.prev_same_point ? (delta > 0 ? "+" : "−") + money(Math.abs(delta), true) : "—"}</div><div class="d">${s.prev_same_point ? `${money(s.prev_same_point, true)} by day ${elapsed}` : "no data"}</div></div>
-      <button class="stat tapstat ${S.need === "want" ? "on" : ""}" id="optstat" title="See every optional purchase this month">
-        <div class="k"><span>Optional (wants)</span><span class="tapk">${S.need === "want" ? "showing ✕" : "see all ›"}</span></div><div class="v num">${money(s.optional, true)}</div>
-        <div class="d">${s.total > 0 ? `${Math.round((s.optional / s.total) * 100)}% · ${money(s.essential, true)} essential` : "nothing yet"}</div></button>`;
+  const tone = !b ? "" : s.total > b ? "up" : (s.projected || s.total) > b ? "warned" : "down";
+  const delta = s.total - s.prev_same_point, rate = s.savings_rate;
+  $("#hero").innerHTML = ribbon([
+    { k: "Daily average", v: money(s.daily_avg), d: `${elapsed} day${elapsed === 1 ? "" : "s"}` },
+    { k: s.is_current ? "Projected" : "Month total", v: money(s.projected ?? s.total, true), d: s.is_current ? "at current pace" : "final", tone: s.is_current ? tone : "" },
+    { k: `vs ${esc(s.prev_label)}`, v: s.prev_same_point ? (delta > 0 ? "+" : "−") + money(Math.abs(delta), true) : "—", d: s.prev_same_point ? `${money(s.prev_same_point, true)} by day ${elapsed}` : "no data", tone: delta > 0 ? "up" : "down" },
+    { k: "Optional (wants)", tap: S.need === "want" ? "showing ✕" : "see all ›", id: "optstat", cls: S.need === "want" ? "on" : "", title: "See every optional purchase this month", v: money(s.optional, true), d: s.total > 0 ? `${Math.round((s.optional / s.total) * 100)}% · ${money(s.essential, true)} essential` : "nothing yet" },
+    { k: "Savings rate", v: rate === null ? "—" : `${Math.round(rate)}%`, d: rate === null ? "no income yet" : `${signed(s.net, true)} net`, tone: rate === null ? "" : rate >= 0 ? "down" : "up" },
+  ]);
   $("#optstat").onclick = async () => {
     S.need = S.need === "want" ? null : "want"; S.offset = 0;
     renderHero();
@@ -885,7 +1273,7 @@ function renderCards() {
     <div>${face}</div><hr>
     <div><div class="spend-h"><h2>Spending</h2><select class="pick" id="pickm" aria-label="Month">${opts}</select></div>
     <div class="spent"><span class="v num">${money(s.total)}</span>${delta !== null ? `<span class="d num"><b class="${delta > 0 ? "up" : "down"}">${delta > 0 ? "↗" : "↘"} ${S.hideAll ? DOTS : pctText(delta)}</b> vs ${esc(s.prev_label)}</span>` : ""}</div>
-    <div class="ticks ${tone}" title="${b ? `${Math.round(pct)}% of budget${s.is_current ? ", outlined bar = even pace" : ""}` : "No budget set"}">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""} ${i === paceAt ? "pace" : ""}"></i>`).join("")}</div>
+    <div class="ticks ${tone}" title="${b ? `${Math.round(pct)}% of budget${s.is_current ? ", the marker = even pace" : ""}` : "No budget set"}">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""} ${i === paceAt ? "pace" : ""}"></i>`).join("")}</div>
     <div class="limit num">${b ? `<span>Monthly Limit: <b>${money(b)}</b></span><span>${s.is_current ? `${money(Math.max(0, b - s.total), true)} left` : `${Math.round(pct)}%`}</span>` : `<span>No monthly budget · <a href="#" id="setb">set one</a></span>`}</div></div>`;
   $("#add").onclick = () => openTxModal();
   $("#pickm").onchange = (e) => setMonth(e.target.value);
@@ -893,7 +1281,7 @@ function renderCards() {
   const sb = $("#setb"); if (sb) sb.onclick = (e) => { e.preventDefault(); openBudgets(); };
 }
 
-// ---------- calendar heatmap ----------
+// ---------- analytics ----------
 function heatLevels(days) {
   const v = days.filter((d) => d.total > 0).map((d) => d.total).sort((a, b) => a - b);
   if (!v.length) return () => 0;
@@ -901,27 +1289,125 @@ function heatLevels(days) {
   const cuts = [q(0.2), q(0.4), q(0.6), q(0.8)];
   return (x) => (x <= 0 ? 0 : 1 + cuts.filter((c) => x > c).length);
 }
+// the month as weeks, with each week's total beside it and the average weekday lined up below
 function renderCalendar() {
   const s = S.stats, today = localToday();
   const lvl = heatLevels(s.days);
   const first = new Date(s.days[0].date + "T12:00:00").getDay(); // 0 Sun
   const lead = (first + 6) % 7; // Monday-first
-  const cells = ["M", "T", "W", "T", "F", "S", "S"].map((d) => `<div class="dow">${d}</div>`);
-  for (let i = 0; i < lead; i++) cells.push(`<div class="day blank"></div>`);
-  for (const d of s.days) {
-    const L = d.future ? 0 : lvl(d.total);
-    cells.push(`<button class="day l${L} ${d.future ? "future" : ""} ${d.date === today ? "today" : ""} ${S.day === d.date ? "sel" : ""}"
-      data-date="${d.date}" data-total="${d.total}" data-count="${d.count}" style="${d.future ? "" : `background:var(--heat-${L})`}" ${d.future ? "disabled" : ""}
-      aria-label="${fmtDay(d.date)}: ${money(d.total)}">
-      <span class="n">${+d.date.slice(8)}</span><span class="amt num">${d.total ? short(d.total) : ""}</span></button>`);
+  const slots = [...Array(lead).fill(null), ...s.days];
+  while (slots.length % 7) slots.push(null);
+  const dows = ["M", "T", "W", "T", "F", "S", "S"];
+  let html = dows.map((d) => `<div class="dow">${d}</div>`).join("") + `<div class="dow wk">Week</div>`;
+  for (let w = 0; w < slots.length; w += 7) {
+    const week = slots.slice(w, w + 7);
+    html += week.map((d) => {
+      if (!d) return `<div class="day blank"></div>`;
+      const L = d.future ? 0 : lvl(d.total);
+      return `<button class="day l${L} ${d.future ? "future" : ""} ${d.date === today ? "today" : ""} ${S.day === d.date ? "sel" : ""}"
+        data-date="${d.date}" data-total="${d.total}" data-count="${d.count}" style="${d.future ? "" : `background:var(--heat-${L})`}" ${d.future ? "disabled" : ""}
+        aria-label="${fmtDay(d.date)}: ${money(d.total)}"><span class="n">${+d.date.slice(8)}</span><span class="amt num">${d.total ? short(d.total) : ""}</span></button>`;
+    }).join("");
+    const sum = week.reduce((a, d) => a + (d ? d.total : 0), 0);
+    html += `<div class="wk-total num">${sum ? short(sum) : "·"}</div>`;
   }
-  $("#cal").innerHTML = `<div class="cal">${cells.join("")}</div>
-    <div class="legend">Less ${[0, 1, 2, 3, 4, 5].map((i) => `<i style="background:var(--heat-${i})"></i>`).join("")} More
-    <span style="margin-left:auto">Tap a day to see its purchases</span></div>`;
-  $("#calnote").textContent = S.day ? "" : "";
+  // average spend per weekday: only days that have happened count
+  const seen = Array.from({ length: 7 }, () => []);
+  s.days.filter((d) => !d.future).forEach((d) => seen[(new Date(d.date + "T12:00:00").getDay() + 6) % 7].push(d.total));
+  const avg = seen.map((x) => (x.length ? x.reduce((a, b) => a + b, 0) / x.length : 0));
+  const top = Math.max(1, ...avg), peak = avg.indexOf(Math.max(...avg));
+  const names = ["Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays", "Sundays"];
+  $("#calnote").textContent = avg[peak] > 0 ? `${names[peak]} cost the most, ${money(avg[peak], true)} on average` : "";
+  $("#cal").innerHTML = `<div class="cal">${html}</div>
+    <div class="cal dowbars">${avg.map((v, i) => `<div class="dowbar ${i === peak && v > 0 ? "peak" : ""}" data-tip="${esc(names[i])}: ${money(v)} on average"><i style="height:${Math.max(v ? 6 : 2, (v / top) * 100)}%"></i></div>`).join("")}<div class="wk-total wk-note">Avg day</div></div>
+    <div class="legend">Less ${[0, 1, 2, 3, 4, 5].map((i) => `<i style="background:var(--heat-${i})"></i>`).join("")} More<span style="margin-left:auto">Tap a day to see its purchases</span></div>`;
   $("#cal").querySelectorAll(".day[data-date]:not(.future)").forEach((el) => {
-    el.onclick = () => { S.day = S.day === el.dataset.date ? null : el.dataset.date; S.offset = 0; renderCalendar(); loadTx(); };
+    el.onclick = () => { S.day = S.day === el.dataset.date ? null : el.dataset.date; S.offset = 0; renderCalendar(); loadTx(); if (S.day) goTo("#txcard"); };
     hoverTip(el, () => `<b>${fmtDay(el.dataset.date, { weekday: "long", month: "short", day: "numeric" })}</b><br>${money(+el.dataset.total)} · ${el.dataset.count} purchase${el.dataset.count === "1" ? "" : "s"}`);
+  });
+  $("#cal").querySelectorAll("[data-tip]").forEach((el) => hoverTip(el, () => el.dataset.tip));
+}
+
+function renderMerchants() {
+  const t = S.stats.top_merchants, max = Math.max(1, ...t.map((m) => m.total));
+  $("#merch").innerHTML = t.length ? t.map((m, i) => `<button class="rank" data-m="${esc(m.merchant || m.name)}" title="See these purchases">
+      <span class="rk num">${i + 1}</span>
+      <span class="rname"><b>${esc(m.merchant || m.name)}</b><span class="rbar"><i style="width:${pct100((m.total / max) * 100)}%;background:${col(m.color)}"></i></span></span>
+      <span class="rval num">${money(m.total, true)}<small>${m.count} × · ${S.stats.total ? Math.round((m.total / S.stats.total) * 100) : 0}%</small></span></button>`).join("") : `<div class="empty">Nothing yet</div>`;
+  $("#merch").querySelectorAll("[data-m]").forEach((el) => el.onclick = () => {
+    S.q = el.dataset.m; $("#tq").value = S.q; S.category = S.day = null; S.offset = 0; loadTx(); goTo("#txcard");
+  });
+}
+
+// where the month went: share of each category, then needs against wants
+function renderMix() {
+  const el = $("#anmix"), s = S.stats;
+  const list = s.categories.filter((c) => c.total > 0).sort((a, b) => b.total - a.total);
+  const head = list.slice(0, 6), rest = list.slice(6), restSum = rest.reduce((a, c) => a + c.total, 0);
+  const segs = [...head.map((c) => ({ v: c.total, color: col(c.color), key: c.name })), ...(restSum > 0 ? [{ v: restSum, color: "var(--axis)", key: "" }] : [])];
+  const sum = segs.reduce((a, x) => a + x.v, 0);
+  const rated = s.essential + s.optional + s.unrated;
+  const need = (v) => (rated > 0 ? pct100((v / rated) * 100) : 0);
+  el.innerHTML = `<h2>Where it went <span class="right note">${esc(s.label)}</span></h2>
+    <div class="mix">${donut(segs, money(s.total, true), `${s.count} purchase${s.count === 1 ? "" : "s"}`)}
+      <div class="mix-l">${list.length ? segs.map((x) => `<button class="mix-r" ${x.key ? `data-cat="${esc(x.key)}"` : "disabled"}><i class="dot" style="background:${x.color}"></i><span>${esc(x.key || `${rest.length} more`)}</span><b class="num">${sum ? Math.round((x.v / sum) * 100) : 0}%</b></button>`).join("") : `<div class="note">Nothing spent yet</div>`}</div></div>
+    <div class="needs"><div class="needs-h"><span>Essential <b class="num">${money(s.essential, true)}</b></span><span>Optional <b class="num">${money(s.optional, true)}</b></span></div>
+      <div class="splitbar"><i style="width:${need(s.essential)}%;background:var(--accent)"></i><i style="width:${need(s.optional)}%;background:var(--gold)"></i><i style="width:${need(s.unrated)}%;background:var(--axis)"></i></div></div>`;
+  el.querySelectorAll("[data-cat]").forEach((b) => b.onclick = () => { S.category = b.dataset.cat; S.offset = 0; renderCats(); loadTx(); goTo("#txcard"); });
+}
+
+// the categories that moved most against last month, up and down from one centre line
+function renderMovers() {
+  const el = $("#anmove"), s = S.stats;
+  const moved = s.categories.map((c) => ({ ...c, diff: c.total - c.prev_total })).filter((c) => Math.abs(c.diff) >= 1).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff)).slice(0, 7).sort((a, b) => b.diff - a.diff);
+  const max = Math.max(1, ...moved.map((c) => Math.abs(c.diff)));
+  el.innerHTML = `<h2>Biggest changes <span class="right note">vs ${esc(s.prev_label)}</span></h2>
+    ${moved.length ? moved.map((c) => `<div class="move"><span class="mname"><i class="dot" style="background:${col(c.color)}"></i>${esc(c.name)}</span>
+      <span class="mbar"><i class="${c.diff > 0 ? "more" : "less"}" style="width:${(Math.abs(c.diff) / max) * 50}%"></i></span>
+      <span class="mval num ${c.diff > 0 ? "up" : "down"}">${c.diff > 0 ? "+" : "−"}${money(Math.abs(c.diff), true)}</span></div>`).join("") : `<div class="note">No change from ${esc(s.prev_label)} yet</div>`}`;
+}
+
+// twelve months stacked by the year's biggest categories
+function renderStack() {
+  const el = $("#ancat");
+  if (!el || !S.trend) return;
+  const ms = S.trend.months, cur = localToday().slice(0, 7), colors = S.trend.colors;
+  const totals = {};
+  ms.forEach((m) => Object.entries(m.by_category).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; }));
+  const topCats = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 6).map((x) => x[0]);
+  const past = ms.filter((m) => m.month <= cur && m.total > 0);
+  const avg = past.length ? past.reduce((a, m) => a + m.total, 0) / past.length : 0;
+  const peak = past.reduce((a, m) => (m.total > (a?.total || 0) ? m : a), null);
+  el.innerHTML = `<h2>Twelve months of spending <span class="right note num">${past.length ? `${money(avg, true)} a month on average${peak ? ` · highest ${esc(peak.label)}, ${money(peak.total, true)}` : ""}` : ""}</span></h2>
+    <div class="stack-chart" id="stackc"></div>
+    <div class="legendrow">${topCats.map((k) => `<span><i class="dot" style="background:${col(colors[k])}"></i>${esc(k)}</span>`).join("")}<span><i class="dot" style="background:var(--axis)"></i>Everything else</span></div>`;
+  const box = $("#stackc"), W = box.clientWidth || 800, H = box.clientHeight || 220, pad = { l: 44, t: 6, b: 22 };
+  const sorted = ms.map((m) => m.total).sort((a, b) => b - a);
+  const capped = sorted[1] > 0 && sorted[0] > sorted[1] * 2.5;
+  const step = niceStep(Math.max(1, capped ? sorted[1] * 1.25 : sorted[0]), 4), top = step * 4;
+  const iw = W - pad.l, ih = H - pad.t - pad.b, slot = iw / ms.length, bw = Math.min(46, slot * 0.62);
+  const Y = (v) => pad.t + ih - (v / top) * ih;
+  const grid = Array.from({ length: 5 }, (_, i) => `<line x1="${pad.l}" x2="${W}" y1="${Y(step * i)}" y2="${Y(step * i)}" stroke="var(--grid)"/><text x="0" y="${Y(step * i) + 4}" class="num">${axisMoney(step * i)}</text>`).join("");
+  const bars = ms.map((m, i) => {
+    const x = pad.l + slot * i + (slot - bw) / 2;
+    const label = `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle" class="${m.month === S.month ? "cur" : ""}">${esc(iw < 460 ? m.label[0] : m.label)}</text>`;
+    if (m.month > cur || m.total <= 0) return label;
+    let y = Y(0);
+    const cut = m.total > top, fit = cut ? top / m.total : 1;
+    const other = m.total - topCats.reduce((a, k) => a + (m.by_category[k] || 0), 0);
+    const parts = [...topCats.map((k) => [m.by_category[k] || 0, col(colors[k])]), [other, "var(--axis)"]].filter((p) => p[0] > 0);
+    const rects = parts.map(([v, c]) => { const h = Math.max(1, ((v * fit) / top) * ih); y -= h; return `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(0, h - 1)}" fill="${c}"/>`; }).join("");
+    const brk = cut ? `<path d="M${x - 3} ${pad.t + 16}l${bw / 3 + 1} -5 ${bw / 3 + 2} 5 ${bw / 3 + 1} -5" stroke="var(--surface)" stroke-width="3.5" fill="none"/><text x="${x + bw + 6}" y="${pad.t + 12}" class="num">${short(m.total)}</text>` : "";
+    return `<g class="sbar ${m.month === S.month ? "cur" : "dim"}" data-m="${m.month}"><rect x="${pad.l + slot * i}" y="0" width="${slot}" height="${H}" fill="transparent"/>${rects}${brk}</g>${label}`;
+  }).join("");
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Spending by month">${grid}${avg ? `<line x1="${pad.l}" x2="${W}" y1="${Y(avg)}" y2="${Y(avg)}" stroke="var(--gold)" stroke-dasharray="6 6"/>` : ""}${bars}</svg>`;
+  box.querySelectorAll("[data-m]").forEach((g) => {
+    const m = ms.find((x) => x.month === g.dataset.m);
+    g.onclick = () => setMonth(m.month);
+    hoverTip(g, () => {
+      const t3 = Object.entries(m.by_category).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      return `<b>${fmtDay(m.month + "-15", { month: "long", year: "numeric" })}</b> · ${money(m.total, true)}` + t3.map(([k, v]) => `<br><span style="color:${col(colors[k])}">●</span> ${esc(k)} ${money(v, true)}`).join("");
+    });
   });
 }
 
@@ -937,41 +1423,64 @@ const aheadOfPace = (c, pace) => c.total <= c.budget && c.total - c.recurring > 
 function renderCats() {
   const s = S.stats;
   const list = s.categories.filter((c) => c.total > 0 || c.budget);
-  const max = Math.max(1, ...list.map((c) => Math.max(c.total, c.budget || 0)));
-  // pace = how far through the month we are; only meaningful for the current month
-  const [y, m] = s.month.split("-").map(Number), dim = new Date(y, m, 0).getDate();
-  const pace = s.is_current ? +localToday().slice(8) / dim : 1;
+  const { dim, elapsed } = monthPace(s);
+  const pace = s.is_current ? elapsed / dim : 1;  // how far through the month we are
+  const typical = Object.fromEntries((S.budgets?.items || []).map((b) => [b.name, b.typical]));
   const budgeted = list.filter((c) => c.budget);
-  $("#catnote").textContent = S.category ? "" : `${list.filter((c) => c.total > 0).length} active`;
-  let sum = "";
-  if (budgeted.length) {
-    const over = budgeted.filter((c) => c.total > c.budget).length;
-    const ahead = s.is_current ? budgeted.filter((c) => aheadOfPace(c, pace)).length : 0;
-    const spent = budgeted.reduce((a, c) => a + c.total, 0), cap = budgeted.reduce((a, c) => a + c.budget, 0);
-    sum = `<div class="bud-sum num">${money(spent, true)} of ${money(cap, true)} budgeted · ${over ? `<span style="color:var(--bad)">${over} over</span>` : "none over"}${ahead ? ` · <span style="color:var(--warn)">${ahead} ahead of pace</span>` : ""}</div>`;
-  }
-  $("#cats").innerHTML = list.length ? sum + list.map((c) => {
-    const over = c.budget && c.total > c.budget;
-    const ahead = !over && c.budget && s.is_current && aheadOfPace(c, pace);
-    const share = s.total ? Math.round((c.total / s.total) * 100) : 0;
-    const diff = c.total - c.prev_total;
-    // budgeted rows fill toward their own budget; the rest share one scale
-    const w = pct100(c.budget ? (c.total / c.budget) * 100 : (c.total / max) * 100);
-    const fill = over ? "var(--bad)" : col(c.color);
-    return `<button class="cat-row ${S.category === c.name ? "active" : ""}" data-cat="${esc(c.name)}">
-      <span class="cat-name"><i class="dot" style="background:${col(c.color)}"></i>${esc(c.name)}</span>
-      <span class="cat-val num">${money(c.total, true)}${c.budget ? ` <small>/ ${money(c.budget, true)}</small>` : ""}</span>
-      <span class="bar"><div style="width:${w}%;background:${fill}"></div>${c.budget && s.is_current ? `<span class="pace" style="left:calc(${pace * 100}% - 1px)" title="Where you'd be at an even pace"></span>` : ""}</span>
-      <span class="cat-meta num">${c.budget
-        ? (over ? `<span class="over">${money(c.total - c.budget, true)} over</span>`
-          : `<span class="${ahead ? "ahead" : ""}">${money(c.budget - Math.max(0, c.total), true)} left${ahead ? " · ahead of pace" : ""}</span>`)
-        : `<span>${share}% · ${c.count} purchase${c.count === 1 ? "" : "s"}</span>`}
-        ${c.prev_total ? `<span style="margin-left:auto">${diff > 0 ? "▲" : "▼"} ${money(Math.abs(diff), true)} vs ${esc(s.prev_label)}</span>` : ""}</span>
+  const over = budgeted.filter((c) => c.total > c.budget).sort((a, b) => b.total / b.budget - a.total / a.budget);
+  const ahead = s.is_current ? budgeted.filter((c) => aheadOfPace(c, pace)).sort((a, b) => b.total / b.budget - a.total / a.budget) : [];
+  const fine = budgeted.filter((c) => !over.includes(c) && !ahead.includes(c)).sort((a, b) => b.total / b.budget - a.total / a.budget);
+  const free = list.filter((c) => !c.budget).sort((a, b) => b.total - a.total);
+  const spent = budgeted.reduce((a, c) => a + c.total, 0), cap = budgeted.reduce((a, c) => a + c.budget, 0);
+
+  // the month as a whole
+  const b = s.budget, pct = b ? (s.total / b) * 100 : 0, left = b ? b - s.total : 0, daysLeft = s.is_current ? dim - elapsed + 1 : 0;
+  const tone = !b ? "var(--accent)" : s.total > b ? "var(--bad)" : (s.projected || s.total) > b ? "var(--warn)" : "var(--accent)";
+  const alloc = [...budgeted].sort((x, y) => y.budget - x.budget);
+  const unassigned = b ? b - cap : 0;
+  $("#budhero").innerHTML = `<div class="bh-ring">${gauge(pct, tone, b && s.is_current ? pace : null, b ? `${Math.round(pct)}%` : "—", b ? `of ${money(b, true)}` : "no budget")}</div>
+    <div class="bh-mid">
+      <div class="note-h">${s.is_current ? "Left to spend" : left >= 0 ? "Left over" : "Over by"}</div>
+      <div class="bh-big num ${left < 0 ? "up" : ""}">${b ? money(Math.abs(left)) : money(s.total)}</div>
+      <div class="bh-stats">
+        <div><span>Spent</span><b class="num">${money(s.total, true)}</b></div>
+        ${s.is_current ? `<div><span>Per day left</span><b class="num">${b && daysLeft ? money(Math.max(0, left) / daysLeft) : "—"}</b></div><div><span>Projected</span><b class="num ${b && s.projected > b ? "warned" : ""}">${money(s.projected ?? s.total, true)}</b></div>` : ""}
+      </div>
+    </div>
+    <div class="bh-alloc">
+      <div class="bh-h"><span>How the budget is split</span><button class="btn dark" id="budbtn">Edit budgets</button></div>
+      <div class="allocbar">${alloc.map((c) => `<span class="aseg" style="flex:${c.budget} 1 0;--c:${col(c.color)}" data-tip="${esc(c.name)}: ${money(c.total, true)} of ${money(c.budget, true)}"><i style="width:${pct100((c.total / c.budget) * 100)}%"></i></span>`).join("")}${unassigned > 0 ? `<span class="aseg free" style="flex:${unassigned} 1 0" data-tip="${money(unassigned, true)} not assigned"></span>` : ""}</div>
+      <div class="bh-foot num"><span>${money(spent, true)} of ${money(cap, true)} budgeted</span><span>${unassigned < 0 ? `<span class="up">${money(-unassigned, true)} more than the total</span>` : unassigned > 0 ? `${money(unassigned, true)} not assigned` : "All assigned"}</span></div>
+      <div class="bh-count">
+        <span class="tag ${over.length ? "bad" : ""} num">${over.length} over</span><span class="tag ${ahead.length ? "warn" : ""} num">${ahead.length} ahead of pace</span><span class="tag ${fine.length ? "good" : ""} num">${fine.length} on track</span>
+      </div>
+    </div>`;
+
+  const N = 24;
+  const row = (c, state) => {
+    const p = c.total / c.budget, on = Math.round(pct100(p * 100) / 100 * N);
+    const at = s.is_current ? Math.min(N - 1, Math.floor(pace * N)) : -1, diff = c.total - c.prev_total;
+    const note = state === "over" ? `<span class="tag bad num">${money(c.total - c.budget, true)} over</span>`
+      : state === "ahead" ? `<span class="tag warn num">${money(c.budget - Math.max(0, c.total), true)} left · ahead of pace</span>`
+      : `<span class="tag num">${money(c.budget - Math.max(0, c.total), true)} left</span>`;
+    return `<button class="cat-row ${state} ${S.category === c.name ? "active" : ""}" data-cat="${esc(c.name)}" title="See these purchases">
+      <span class="cr-top"><span class="cat-name"><i class="dot" style="background:${col(c.color)}"></i>${esc(c.name)}</span><span class="cat-val num">${money(c.total, true)} <small>/ ${money(c.budget, true)}</small></span></span>
+      <span class="seglets" style="--c:${state === "over" ? "var(--bad)" : col(c.color)}">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""} ${i === at ? "pace" : ""}"></i>`).join("")}</span>
+      <span class="cr-foot">${note}<span class="note num">${typical[c.name] ? `typical ${money(typical[c.name], true)}` : ""}${c.prev_total ? `${typical[c.name] ? " · " : ""}${diff > 0 ? "▲" : "▼"} ${money(Math.abs(diff), true)} vs ${esc(s.prev_label)}` : ""}</span></span>
     </button>`;
-  }).join("") : `<div class="empty">No spending yet</div>`;
+  };
+  const urgent = [...over.map((c) => row(c, "over")), ...ahead.map((c) => row(c, "ahead"))];
+  const max = Math.max(1, ...free.map((c) => c.total));
+  $("#cats").innerHTML = list.length ? `
+    <div class="bud-left"><section class="card bud-col"><h2>Needs attention <span class="right note num">${urgent.length}</span></h2><div class="bud-list">${urgent.join("") || `<div class="bud-clear">Nothing over budget or ahead of pace</div>`}</div></section>
+    ${free.length ? `<section class="card bud-col bud-free"><h2>No budget <span class="right note">${s.is_current ? "spending so far" : "spent"}</span></h2><div class="free-list">${free.map((c) => `<button class="cat-row plain" data-cat="${esc(c.name)}"><span class="cat-name"><i class="dot" style="background:${col(c.color)}"></i>${esc(c.name)}</span><span class="cat-val num">${money(c.total, true)}</span><span class="rbar"><i style="width:${pct100((c.total / max) * 100)}%;background:${col(c.color)}"></i></span><span class="note num">${s.total ? Math.round((c.total / s.total) * 100) : 0}% · ${c.count} purchase${c.count === 1 ? "" : "s"}</span></button>`).join("")}</div></section>` : ""}</div>
+    <section class="card bud-col"><h2>On track <span class="right note num">${fine.length}</span></h2><div class="bud-list two-up">${fine.map((c) => row(c, "fine")).join("") || `<div class="note">No budgets on track yet</div>`}</div></section>`
+    : `<div class="card empty">No spending yet</div>`;
   $("#cats").querySelectorAll(".cat-row").forEach((el) => {
-    el.onclick = () => { S.category = S.category === el.dataset.cat ? null : el.dataset.cat; S.offset = 0; renderCats(); loadTx(); };
+    el.onclick = () => { S.category = S.category === el.dataset.cat ? null : el.dataset.cat; S.offset = 0; renderCats(); loadTx(); if (S.category) goTo("#txcard"); };
   });
+  $("#budhero").querySelectorAll("[data-tip]").forEach((el) => hoverTip(el, () => el.dataset.tip));
+  $("#budbtn").onclick = () => openBudgets();
 }
 
 // ---------- budgets ----------
@@ -1123,32 +1632,71 @@ function renderChart() {
   };
 }
 let chartResize;
-addEventListener("resize", () => { clearTimeout(chartResize); chartResize = setTimeout(() => { renderChart(); fitTx(); }, 120); });
-
-function renderMerchants() {
-  const t = S.stats.top_merchants;
-  $("#merch").innerHTML = t.length ? t.map((m) => `<div class="merch"><span><i class="dot" style="background:${col(m.color)}"></i>${esc(m.merchant || m.name)}</span>
-    <span class="num">${money(m.total, true)} <small class="note">×${m.count}</small></span></div>`).join("") : `<div class="empty">Nothing yet</div>`;
-}
+addEventListener("resize", () => { clearTimeout(chartResize); chartResize = setTimeout(() => { rerender(); fitTx(); }, 120); });
 
 // ---------- cash flow ----------
 const signed = (n, whole) => `${n >= 0 ? "+" : "−"}${money(Math.abs(n), whole)}`;
 function renderFlow() {
-  const s = S.stats, inc = S.income;
-  const rate = s.savings_rate;
-  const rows = inc.items.map((i) => `<div class="rec">
-      <div><b style="font-weight:550">${esc(i.payer)}</b>
-      <small>${esc([fmtDay(i.date), i.account, { recurring: "recurring", bank: "from statement" }[i.source] || "", i.note].filter(Boolean).join(" · "))}</small></div>
+  const s = S.stats, inc = S.income, ms = S.trend?.months || [], yr = S.incYear;
+  const cur = localToday().slice(0, 7), past = ms.filter((m) => m.month <= cur);
+  const paid = past.filter((m) => m.income > 0);
+  const ytd = past.reduce((a, m) => a + (m.income || 0), 0), avg = paid.length ? ytd / paid.length : 0;
+  const incPct = pctChange(s.income, s.prev_income), rate = s.savings_rate;
+  $("#incstats").innerHTML = ribbon([
+    { k: s.is_current ? "This month" : esc(s.label), v: money(s.income), d: `${s.income_count} payment${s.income_count === 1 ? "" : "s"}`, tone: "pos" },
+    { k: `vs ${esc(s.prev_label)}`, v: incPct === null ? "—" : S.hideAll ? DOTS : pctText(incPct), d: `${money(s.prev_income, true)} in ${esc(s.prev_label)}`, tone: incPct === null ? "" : incPct >= 0 ? "pos" : "up" },
+    { k: `${S.trendYear || ""} so far`, v: money(ytd, true), d: `${paid.length} month${paid.length === 1 ? "" : "s"} with income` },
+    { k: "Monthly average", v: money(avg, true), d: "across paid months" },
+    { k: "Kept", v: rate === null ? "—" : `${Math.round(rate)}%`, d: `${signed(s.net, true)} after ${money(s.total, true)} spent`, tone: s.net >= 0 ? "pos" : "up" },
+  ]);
+  // income and spending side by side, month by month
+  const chart = $("#incchart");
+  if (ms.length) {
+    chart.innerHTML = `<div class="chart-h"><h2>Income against spending</h2><span class="legendrow" style="margin:0 0 0 auto"><span><i class="dot" style="background:var(--accent)"></i>Income</span><span><i class="dot" style="background:var(--gold)"></i>Spent</span></span></div><div class="plain-chart" id="incc"></div>`;
+    const box = $("#incc"), W = box.clientWidth || 800, H = box.clientHeight || 220, pad = { l: 44, t: 16, b: 22 };
+    const vals = past.flatMap((m) => [m.total, m.income || 0]).sort((a, b) => b - a);
+    const capped = vals[1] > 0 && vals[0] > vals[1] * 1.6;
+    const step = niceStep(Math.max(1, capped ? vals[1] * 1.15 : vals[0]), 4), top = step * 4;
+    const iw = W - pad.l, ih = H - pad.t - pad.b, slot = iw / ms.length, bw = Math.min(20, slot * 0.28);
+    const Y = (v) => pad.t + ih - (Math.min(v, top) / top) * ih, base = Y(0);
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Income and spending by month">
+      ${Array.from({ length: 5 }, (_, i) => `<line x1="${pad.l}" x2="${W}" y1="${Y(step * i)}" y2="${Y(step * i)}" stroke="var(--grid)"/><text x="0" y="${Y(step * i) + 4}" class="num">${axisMoney(step * i)}</text>`).join("")}
+      ${avg ? `<line x1="${pad.l}" x2="${W}" y1="${Y(avg)}" y2="${Y(avg)}" stroke="var(--accent)" stroke-dasharray="6 6" opacity=".55"/>` : ""}
+      ${ms.map((m, i) => {
+        const x = pad.l + slot * i + slot / 2, on = m.month === S.month, future = m.month > cur;
+        const cutI = (m.income || 0) > top, cutS = m.total > top;
+        const label = `<text x="${x}" y="${H - 5}" text-anchor="middle" class="${on ? "cur" : ""}">${esc(iw < 460 ? m.label[0] : m.label)}</text>`;
+        if (future) return label;
+        return `<g class="sbar ${on ? "cur" : "dim"}" data-m="${m.month}"><rect x="${pad.l + slot * i}" y="0" width="${slot}" height="${H}" fill="transparent"/>
+          <rect x="${x - bw - 1}" y="${Y(m.income || 0)}" width="${bw}" height="${Math.max(0, base - Y(m.income || 0))}" rx="3" fill="var(--accent)"/>
+          <rect x="${x + 1}" y="${Y(m.total)}" width="${bw}" height="${Math.max(0, base - Y(m.total))}" rx="3" fill="var(--gold)"/>
+          ${cutS ? `<text x="${x + 2}" y="${pad.t - 5}" class="num">${short(m.total)}</text>` : ""}${cutI ? `<text x="${x - bw}" y="${pad.t - 5}" class="num">${short(m.income)}</text>` : ""}</g>${label}`;
+      }).join("")}</svg>`;
+    box.querySelectorAll("[data-m]").forEach((g) => {
+      const m = ms.find((x) => x.month === g.dataset.m);
+      g.onclick = () => setMonth(m.month);
+      hoverTip(g, () => `<b>${fmtDay(m.month + "-15", { month: "long", year: "numeric" })}</b><br>Income ${money(m.income || 0, true)} · spent ${money(m.total, true)}<br>Net ${m.net >= 0 ? "+" : "−"}${money(Math.abs(m.net), true)}`);
+    });
+  }
+  // who paid you this year
+  if (yr) {
+    const by = {};
+    yr.items.forEach((i) => { (by[i.payer] ||= { sum: 0, n: 0, last: i.date }); by[i.payer].sum += i.amount; by[i.payer].n += 1; if (i.date > by[i.payer].last) by[i.payer].last = i.date; });
+    const list = Object.entries(by).sort((a, b) => b[1].sum - a[1].sum), max = Math.max(1, ...list.map((x) => x[1].sum));
+    const tints = ["var(--accent)", "var(--gold)", "#8f85e9", "#e5774f", "#5fce6e"];
+    const segs = list.slice(0, 4).map(([k, v], i) => ({ v: v.sum, color: tints[i], key: k }));
+    const rest = list.slice(4).reduce((a, x) => a + x[1].sum, 0);
+    if (rest > 0) segs.push({ v: rest, color: "var(--axis)", key: "" });
+    $("#incsrc").innerHTML = `<h2>Where it comes from <span class="right note">${S.trendYear}</span></h2>
+      <div class="src-top">${donut(segs, money(yr.total, true), `${yr.count} payment${yr.count === 1 ? "" : "s"}`, 128)}
+        <div class="src-l">${list.slice(0, 5).map(([k, v], i) => `<div class="src"><span class="um"><b><i class="dot" style="background:${tints[i] || "var(--axis)"}"></i>${esc(k)}</b><small class="num">${v.n} × · last ${fmtDay(v.last, { month: "short", day: "numeric" })}</small></span><span class="num">${money(v.sum, true)}<small>${yr.total ? Math.round((v.sum / yr.total) * 100) : 0}%</small></span></div>`).join("") || `<div class="note">No income logged yet</div>`}</div></div>`;
+  }
+  const rows = inc.items.map((i) => `<div class="uline income">${dateTile(i.date)}
+      <div class="um"><b>${esc(i.payer)}</b><small>${esc([i.account, { recurring: "recurring", bank: "from statement" }[i.source] || "", i.note].filter(Boolean).join(" · "))}</small></div>
       <span class="num pos">+${money(i.amount)}</span>
-      <button class="ghost" data-inc="${i.id}" aria-label="Edit">⋯</button></div>`).join("");
-  $("#flowcard").innerHTML = `<h2>Cash flow <button class="ghost right" id="addinc" style="padding:2px 8px">+ Income</button></h2>
-    <div class="flow">
-      <div class="stat"><div class="k">Income</div><div class="v num pos">${money(s.income, true)}</div><div class="d">${s.income_count} payment${s.income_count === 1 ? "" : "s"}</div></div>
-      <div class="stat"><div class="k">Spent</div><div class="v num">${money(s.total, true)}</div><div class="d">${s.count} purchases</div></div>
-      <div class="stat"><div class="k">Net</div><div class="v num ${s.net >= 0 ? "pos" : "up"}">${signed(s.net, true)}</div>
-        <div class="d">${rate === null ? "no income yet" : `${rate >= 0 ? "saved" : "overspent"} ${Math.abs(Math.round(rate))}%`}</div></div>
-    </div>
-    ${rows || `<div class="empty" style="padding:12px 0">No income logged for ${esc(s.label)}. Add your paycheque under Recurring as income and it's logged automatically.</div>`}`;
+      <button class="more3" data-inc="${i.id}" aria-label="Edit ${esc(i.payer)}">•••</button></div>`).join("");
+  $("#flowcard").innerHTML = `<h2>${esc(s.label)} payments <span class="right num note">${money(s.income)} in · ${money(s.total)} out</span><button class="btn dark" id="addinc">${ICON.plus}Income</button></h2>
+    <div class="ledger">${rows || `<div class="empty" style="padding:12px 0">No income logged for ${esc(s.label)}. Add your paycheque under Recurring as income and it's logged automatically.</div>`}</div>`;
   $("#addinc").onclick = () => openIncomeModal();
   $("#flowcard").querySelectorAll("[data-inc]").forEach((el) => el.onclick = () => openIncomeModal(inc.items.find((x) => x.id === +el.dataset.inc)));
 }
@@ -1159,6 +1707,8 @@ const EYE_OFF = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" str
 const ACC_TYPES = { chequing: "Chequing", savings: "Savings", investment: "Investments", cash: "Cash",
   other_asset: "Other asset", credit: "Credit card", loan: "Loan / line of credit" };
 const daysAgo = (iso) => Math.round((new Date(localToday() + "T12:00:00") - new Date(iso + "T12:00:00")) / 864e5);
+const ACC_TINT = { chequing: "#3aa9b8", savings: "#5fce6e", investment: "#c9a94e", cash: "#9a9a94", other_asset: "#8f85e9", credit: "#e5774f", loan: "#e66767" };
+const ACC_ICON = { chequing: "bank", savings: "wallet", investment: "income", cash: "wallet", other_asset: "wallet", credit: "list", loan: "down2" };
 function renderAccounts() {
   const hm = (n, whole) => (S.hideNW ? "••••••" : money(n, whole));  // eye toggle: hide balances
   const A = S.accounts, all = S.networth.months, ms = all.slice(-12);  // the 13th (last Dec) is only for "since"
@@ -1166,46 +1716,75 @@ function renderAccounts() {
   const known = ms.filter((m) => !m.future && m.net !== null && m.net !== undefined);
   const thisM = ms.find((m) => m.month === cur), prevM = all.find((m) => m.month === shiftYm(cur, -1));
   const change = thisM && prevM && prevM.net != null && !prevM.partial && thisM.net != null ? thisM.net - prevM.net : null;
-  const max = Math.max(1, ...known.map((m) => Math.abs(m.net)));
-  const chart = known.length ? `<div class="trend nwchart">${ms.map((m) => {
-      const has = !m.future && m.net != null;
-      return `<div class="tcol future ${m.partial ? "partial" : ""}" data-nw="${m.month}">${has ? `<div class="tbar ${m.net < 0 ? "negbar" : ""}" style="height:${(Math.abs(m.net) / max) * 82}%"></div>` : ""}</div>`;
-    }).join("")}</div>
-    <div class="tlabels">${ms.map((m) => `<span class="${m.future ? "future" : ""}"><span class="lf">${m.label}</span><span class="ls">${m.label[0]}</span></span>`).join("")}</div>` : "";
-  const row = (a) => {
+  const dayLabel = (d) => fmtDay(d, { month: "short", day: "numeric", year: d.slice(0, 4) === localToday().slice(0, 4) ? undefined : "numeric" });
+  const card = (a) => {
     const stale = a.as_of && daysAgo(a.as_of) > 31;
-    const dayLabel = (d) => fmtDay(d, { month: "short", day: "numeric", year: d.slice(0, 4) === localToday().slice(0, 4) ? undefined : "numeric" });
     const when = a.as_of ? `as of ${dayLabel(a.as_of)}` : "no balance yet";
     // statements come monthly, so a CSV that ends more than ~5 weeks ago is due
     const late = a.active && a.imported_through && daysAgo(a.imported_through) > 35;
-    const csv = a.imported_through ? `<span class="${late ? "stale" : ""}" title="Latest statement row imported">CSV through ${dayLabel(a.imported_through)}</span>`
-      : a.type === "cash" || !a.active ? "" : "no CSV yet";
-    return `<div class="acc ${a.active ? "" : "closed"}">
-      <div><b>${esc(a.name)}</b><small class="${stale ? "stale" : ""}">${esc(ACC_TYPES[a.type] || a.type)} · ${when}${a.income_since ? ` · +${hm(a.income_since, true)} ${a.liability ? "paid" : "income"} since` : ""}${csv ? ` · ${csv}` : ""}${a.active ? "" : " · closed"}</small></div>
-      <button class="ghost num bal" data-bal="${a.id}" title="Update balance">${a.balance === null ? "Set balance" : (a.liability && a.balance ? "−" : "") + hm(a.balance)}</button>
-      <button class="ghost" data-acc="${a.id}" aria-label="Edit account">⋯</button></div>`;
+    const csv = a.imported_through ? `<span class="tag ${late ? "warn" : ""}" title="Latest statement row imported">CSV through ${dayLabel(a.imported_through)}</span>`
+      : a.type === "cash" || !a.active ? "" : `<span class="tag">No CSV yet</span>`;
+    const tint = ACC_TINT[a.type] || ACC_TINT.other_asset;
+    return `<article class="acard ${a.active ? "" : "closed"}" style="--t:${tint}">
+      <div class="ac-top"><i class="tile">${ICON[ACC_ICON[a.type] || "wallet"].replace('width="18" height="18"', 'width="15" height="15"')}</i>
+        <div class="ac-name"><b>${esc(a.name)}</b><small>${esc(ACC_TYPES[a.type] || a.type)}${a.active ? "" : " · closed"}</small></div>
+        <button class="kebab" data-acc="${a.id}" aria-label="Edit account">⋯</button></div>
+      <button class="ac-bal num" data-bal="${a.id}" title="Update balance">${a.balance === null ? "Set balance" : (a.liability && a.balance ? "−" : "") + hm(a.balance)}</button>
+      <div class="ac-foot"><span class="tag ${stale ? "warn" : ""}">${when}</span>${csv}${a.income_since ? `<span class="tag good num">+${hm(a.income_since, true)} ${a.liability ? "paid" : "income"} since</span>` : ""}</div>
+    </article>`;
   };
   const assets = A.items.filter((a) => !a.liability), debts = A.items.filter((a) => a.liability);
-  const group = (title, list, total) => list.length ? `<div class="acc-group"><span>${title}</span><span class="num">${hm(total, true)}</span></div>${list.map(row).join("")}` : "";
   const partialNow = thisM && thisM.partial;
-  $("#acccard").innerHTML = `<h2>Accounts <button class="ghost" id="eyenw" style="padding:2px 6px" aria-label="${S.hideNW ? "Show" : "Hide"} balances" title="${S.hideNW ? "Show" : "Hide"} balances">${S.hideNW ? EYE_OFF : EYE}</button><button class="ghost right" id="impacc" style="padding:2px 8px">Import CSV</button><button class="ghost" id="addacc" style="padding:2px 8px">+ Add</button></h2>
-    ${A.items.length ? `<div class="nw"><span class="big num">${A.net_worth < 0 ? "−" : ""}${hm(Math.abs(A.net_worth), true)}</span>
-      ${change !== null ? `<span class="num ${change >= 0 ? "pos" : "up"}">${change >= 0 ? "▲" : "▼"} ${hm(Math.abs(change), true)} since ${esc(prevM.label)}</span>` : ""}</div>
-      <div class="note">${hm(A.assets, true)} assets − ${hm(A.liabilities, true)} owed${partialNow ? " · some accounts have no balance yet" : ""}</div>
-      ${chart}
-      ${group("Assets", assets, A.assets)}${group("Owed", debts, A.liabilities)}
-      <div class="note" style="margin-top:10px">Tap a balance to update it. Income paid into an account is added until the next update. Balances older than a month and CSVs more than 5 weeks old show in amber.</div>`
-    : `<div class="empty" style="padding:16px 0">Add your chequing, savings, investments and cards to track net worth. Update each balance whenever you check it, e.g. once a month.</div>`}`;
+  const worth = A.assets + A.liabilities;
+  const split = (list, base, cls) => list.filter((a) => a.balance > 0).sort((x, y) => y.balance - x.balance).map((a) => `<span class="${cls}" style="flex:${a.balance} 1 0;--t:${ACC_TINT[a.type] || ACC_TINT.other_asset}" data-tip="${esc(a.name)}: ${hm(a.balance)}${base ? ` · ${Math.round((a.balance / base) * 100)}%` : ""}"></span>`).join("");
+  const chart = known.length ? `<div class="plain-chart" id="nwchart"></div>` : "";
+  $("#acccard").innerHTML = `
+    <section class="card lift nw-hero">
+      <div class="nw-side">
+        <div class="note-h nw-label">Net worth <button class="ghost" id="eyenw" style="padding:2px 6px" aria-label="${S.hideNW ? "Show" : "Hide"} balances" title="${S.hideNW ? "Show" : "Hide"} balances">${S.hideNW ? EYE_OFF : EYE}</button></div>
+        ${A.items.length ? `<div class="nw-big num">${A.net_worth < 0 ? "−" : ""}${hm(Math.abs(A.net_worth))}</div>
+        ${change !== null ? `<span class="tag ${change >= 0 ? "good" : "bad"} num">${change >= 0 ? "▲" : "▼"} ${hm(Math.abs(change), true)} since ${esc(prevM.label)}</span>` : `<span class="tag">No earlier month to compare</span>`}
+        <div class="nw-compo">
+          <div class="nw-line"><span>Assets</span><b class="num">${hm(A.assets, true)}</b></div>
+          <div class="compo">${split(assets, A.assets, "cseg")}</div>
+          <div class="nw-line"><span>Owed</span><b class="num">${hm(A.liabilities, true)}</b></div>
+          <div class="compo"><span style="flex:${worth ? Math.max(A.liabilities / worth, 0.004) : 0} 1 0;display:flex;gap:2px">${split(debts, A.liabilities, "cseg")}</span><span style="flex:${worth ? 1 - A.liabilities / worth : 1} 1 0"></span></div>
+        </div>
+        ${partialNow ? `<div class="note">Some accounts have no balance yet</div>` : ""}` : ""}
+      </div>
+      <div class="nw-main"><div class="nw-tools"><span class="note-h">${S.month.slice(0, 4)} by month</span><span class="nw-btns"><button class="btn dark" id="impacc">Import CSV</button><button class="btn dark" id="addacc">${ICON.plus}Add account</button></span></div>
+        ${chart}${known.length < 2 ? `<p class="note nw-hint">${known.length ? "This line grows as you record balances each month." : ""}</p>` : ""}</div>
+    </section>
+    ${A.items.length ? `<div class="ac-group"><h2>Assets <span class="num">${hm(A.assets, true)}</span></h2><div class="ac-grid">${assets.map(card).join("")}</div></div>
+    ${debts.length ? `<div class="ac-group"><h2>Owed <span class="num">${hm(A.liabilities, true)}</span></h2><div class="ac-grid">${debts.map(card).join("")}</div></div>` : ""}
+    <p class="note">Tap a balance to update it. Income paid into an account is added until the next update. Balances older than a month and CSVs more than 5 weeks old show in amber.</p>`
+    : `<div class="card empty" style="padding:16px">Add your chequing, savings, investments and cards to track net worth. Update each balance whenever you check it, e.g. once a month.</div>`}`;
+  const box = $("#nwchart");
+  if (box) {
+    const W = box.clientWidth || 700, H = box.clientHeight || 170, pad = { l: 44, t: 10, b: 22 }, n = ms.length;
+    const vals = known.map((m) => m.net), step = niceStep(Math.max(1, ...vals.map(Math.abs)), 4), top = step * 4;
+    const low = Math.min(0, ...vals) < 0 ? -step * Math.ceil(-Math.min(...vals) / step) : 0;
+    const X = (i) => pad.l + 14 + (i / (n - 1)) * (W - pad.l - 34), Y = (v) => pad.t + (H - pad.t - pad.b) * (1 - (v - low) / (top - low));
+    const idx = (m) => ms.indexOf(m), pts = known.map((m) => [X(idx(m)), Y(m.net)]);
+    const ticks = Array.from({ length: 5 }, (_, i) => low + ((top - low) / 4) * i);
+    const axis = (v) => (S.hideNW ? "••" : axisMoney(Math.abs(v)));
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Net worth by month"><defs><linearGradient id="nwfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2fb9c6" stop-opacity=".28"/><stop offset="1" stop-color="#2fb9c6" stop-opacity="0"/></linearGradient></defs>
+      ${ticks.map((v) => `<line x1="${pad.l}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="0" y="${Y(v) + 4}" class="num">${v < 0 ? "−" : ""}${axis(v)}</text>`).join("")}
+      ${ms.map((m, i) => `<text x="${X(i)}" y="${H - 5}" text-anchor="middle">${esc(W < 480 ? m.label[0] : m.label)}</text>`).join("")}
+      ${pts.length > 1 ? `<path d="${roundedLine(pts)}L${pts.at(-1)[0]} ${Y(Math.max(low, 0))}L${pts[0][0]} ${Y(Math.max(low, 0))}Z" fill="url(#nwfill)"/><path d="${roundedLine(pts)}" fill="none" stroke="var(--accent)" stroke-width="2"/>` : ""}
+      ${known.map((m) => `<circle data-nw="${m.month}" cx="${X(idx(m))}" cy="${Y(m.net)}" r="${m.partial ? 3.5 : 5}" fill="${m.net < 0 ? "var(--bad)" : "var(--accent)"}" stroke="var(--surface)" stroke-width="2"/>`).join("")}
+    </svg>`;
+    box.querySelectorAll("[data-nw]").forEach((el) => {
+      const m = ms.find((x) => x.month === el.dataset.nw);
+      hoverTip(el, () => `<b>${fmtDay(m.month + "-15", { month: "long", year: "numeric" })}</b> · ${m.net < 0 ? "−" : ""}${hm(Math.abs(m.net), true)}<br>${hm(m.assets, true)} assets − ${hm(m.liabilities, true)} owed${m.partial ? "<br>Some accounts had no balance yet" : ""}`);
+    });
+  }
   $("#addacc").onclick = () => openAccountModal();
   $("#eyenw").onclick = () => { S.hideNW = !S.hideNW; store.set("spend_hide_nw", S.hideNW ? "1" : "0"); renderAccounts(); };
   $("#impacc").onclick = () => openImportModal();
   $("#acccard").querySelectorAll("[data-bal]").forEach((el) => el.onclick = () => openBalanceModal(A.items.find((x) => x.id === +el.dataset.bal)));
   $("#acccard").querySelectorAll("[data-acc]").forEach((el) => el.onclick = () => openAccountModal(A.items.find((x) => x.id === +el.dataset.acc)));
-  $("#acccard").querySelectorAll("[data-nw]").forEach((el) => {
-    const m = ms.find((x) => x.month === el.dataset.nw);
-    if (m.future || m.net == null) return;
-    hoverTip(el, () => `<b>${fmtDay(m.month + "-15", { month: "long", year: "numeric" })}</b> · ${m.net < 0 ? "−" : ""}${hm(Math.abs(m.net), true)}<br>${hm(m.assets, true)} assets − ${hm(m.liabilities, true)} owed${m.partial ? "<br>Some accounts had no balance yet" : ""}`);
-  });
+  $("#acccard").querySelectorAll("[data-tip]").forEach((el) => hoverTip(el, () => el.dataset.tip));
   renderKpis(); renderCards();
 }
 
@@ -1221,6 +1800,7 @@ function txStatus(i) {
 function renderTx() {
   const t = S.tx;
   const qEl = $("#q"), typing = qEl && document.activeElement === qEl ? qEl.value : null;
+  const kept = $("#txcard .tbody")?.scrollTop || 0;
   const filters = [];
   if (S.day) filters.push(`<button class="chip" data-clear="day">${fmtDay(S.day)} <b>✕</b></button>`);
   if (S.category) { const c = S.cats.find((x) => x.name === S.category); filters.push(`<button class="chip" data-clear="category"><i class="dot" style="background:${col(c?.color)}"></i>${esc(S.category)} <b>✕</b></button>`); }
@@ -1239,7 +1819,7 @@ function renderTx() {
       <div class="c-check"><input type="checkbox" data-pick="${i.id}" aria-label="Select ${esc(i.merchant)}" ${S.sel.has(i.id) ? "checked" : ""}></div>
       <div class="c-id num">TXN-${i.date.slice(0, 4)}-${String(i.id).padStart(3, "0")}</div>
       <div class="c-desc desc"><span class="logo" style="background:${col(i.color)}">${esc([...i.merchant.trim()][0]?.toUpperCase() || "?")}</span><div class="m"><b>${esc(i.merchant)}</b>${meta ? `<small>${meta}</small>` : ""}</div></div>
-      <div class="c-cat"><button class="pill" data-cat="${i.id}"><i class="dot" style="background:${col(i.color)}"></i>${esc(i.category)}${srcTag}</button></div>
+      <div class="c-cat"><button class="pill" data-cat="${i.id}" style="--c:${col(i.color)}"><i class="dot" style="background:${col(i.color)}"></i>${esc(i.category)}${srcTag}</button></div>
       <div class="c-date num">${fmtDay(i.date, { month: "short", day: "2-digit", year: "numeric" })}</div>
       <div class="c-amt"><button class="a num ${i.amount < 0 ? "neg" : ""}" data-edit="${i.id}" title="Edit">${i.fx_pending ? "…" : `${i.amount < 0 ? "+" : "−"}${money(Math.abs(i.amount))}`}</button></div>
       <div class="c-stat"><span class="badge ${tone}">${label}</span></div>
@@ -1251,10 +1831,10 @@ function renderTx() {
   $("#txcard").innerHTML = `<div class="tx-h"><h2>${S.day ? fmtDay(S.day, { weekday: "long", month: "long", day: "numeric" }) : "Transaction History"}</h2>
       <div class="tx-tools"><label class="tsearch">${ICON.search}<input id="q" placeholder="Search" aria-label="Search purchases" value="${esc(typing ?? S.q)}"></label><button class="btn dark" id="filter">${ICON.filter}Filter</button></div></div>
     <div class="filters">${filters.join("")}</div>
-    <div class="tbl"><div class="tr th"><div class="c-check"></div><div class="c-id">Transaction ID</div><div>Description</div><div>Category</div><div class="c-date">Date</div><div>Amount</div><div>Status</div><div></div></div>
-    ${rows.length ? rows.join("") : `<div class="empty">${S.review ? "Nothing left to review" : S.q || S.day || S.category ? "No matching purchases" : "No purchases this month"}</div>`}
+    <div class="tbl"><div class="tr th"><div class="c-check"></div><div class="c-id">Transaction ID</div><div>Description</div><div>Category</div><div class="c-date">Date</div><div>Amount</div><div class="c-stat">Status</div><div></div></div>
+    <div class="tbody">${rows.length ? rows.join("") : `<div class="empty">${S.review ? "Nothing left to review" : S.q || S.day || S.category ? "No matching purchases" : "No purchases this month"}</div>`}</div>
     <div class="tfoot"><span class="num">${picked.length ? `${picked.length} selected · ${money(picked.reduce((a, x) => a + x, 0))}` : `Showing ${t.items.length} of ${t.count} · ${money(t.total)}`}</span>
-      <div class="pager num"><button id="pgprev" aria-label="Previous page" ${page <= 1 ? "disabled" : ""}>${ICON.left}</button><span>Page ${page} of ${pages}</span><button id="pgnext" aria-label="Next page" ${page >= pages ? "disabled" : ""}>${ICON.right}</button></div></div></div>`;
+      <div class="pager num" ${pages > 1 ? "" : 'hidden'}><button id="pgprev" aria-label="Previous page" ${page <= 1 ? "disabled" : ""}>${ICON.left}</button><span>Page ${page} of ${pages}</span><button id="pgnext" aria-label="Next page" ${page >= pages ? "disabled" : ""}>${ICON.right}</button></div></div></div>`;
   let deb;
   $("#q").oninput = (e) => { clearTimeout(deb); deb = setTimeout(() => { S.q = e.target.value.trim(); $("#tq").value = S.q; S.offset = 0; loadTx().then(() => { const q = $("#q"); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }); }, 250); };
   $("#txcard").querySelectorAll("[data-clear]").forEach((el) => el.onclick = () => {
@@ -1264,17 +1844,113 @@ function renderTx() {
   });
   $("#txcard").querySelectorAll("[data-cat]").forEach((el) => el.onclick = (e) => { e.stopPropagation(); catPicker(el, t.items.find((x) => x.id === +el.dataset.cat)); });
   $("#txcard").querySelectorAll("[data-edit]").forEach((el) => el.onclick = () => openTxModal(t.items.find((x) => x.id === +el.dataset.edit)));
+  $("#txcard").querySelectorAll(".tr[data-id]").forEach((el) => el.onclick = (e) => {
+    if (S.view !== "transactions" || e.target.closest("button, input")) return;
+    S.pick = +el.dataset.id; renderInspector();
+  });
   $("#txcard").querySelectorAll("[data-pick]").forEach((el) => el.onchange = () => {
     const x = t.items.find((i) => i.id === +el.dataset.pick);
     if (el.checked) S.sel.set(x.id, x.amount); else S.sel.delete(x.id);
     renderTx();
   });
   const go = (d) => { S.offset = Math.max(0, S.offset + d * S.txPage); loadTx(); };
+  $("#txcard .tbody").scrollTop = kept;
   $("#pgprev").onclick = () => go(-1);
   $("#pgnext").onclick = () => go(1);
   $("#filter").onclick = (e) => { e.stopPropagation(); filterPop(e.currentTarget); };
   const rc = $("#revchip"); if (rc) rc.onclick = () => { S.review = !S.review; S.offset = 0; loadTx(); };
+  renderRail(); renderTxStats(); renderInspector();
   fitTx();
+}
+// filters that sit above the table on the Transactions tab
+function renderRail() {
+  const el = $("#txrail");
+  if (!el) return;
+  const s = S.stats, nrev = s.review_count || 0;
+  const kind = S.review ? "review" : S.need || "all";
+  const tabs = [["all", "All"], ["need", "Essential"], ["want", "Optional"], ...(nrev || S.review ? [["review", `To review ${nrev}`]] : [])];
+  const cats = s.categories.filter((c) => c.total > 0).sort((a, b) => b.total - a.total);
+  el.innerHTML = `<div class="seg2">${tabs.map(([k, v]) => `<button data-kind="${k}" class="${kind === k ? "on" : ""}">${v}</button>`).join("")}</div>
+    <div class="rail-cats">${cats.map((c) => `<button class="cchip ${S.category === c.name ? "on" : ""}" data-rail="${esc(c.name)}" style="--c:${col(c.color)}"><i class="dot" style="background:${col(c.color)}"></i>${esc(c.name)} <b class="num">${money(c.total, true)}</b></button>`).join("")}</div>`;
+  el.querySelectorAll("[data-kind]").forEach((b) => b.onclick = () => {
+    const k = b.dataset.kind;
+    S.review = k === "review"; S.need = k === "need" || k === "want" ? k : null; S.offset = 0;
+    renderHero(); loadTx();
+  });
+  el.querySelectorAll("[data-rail]").forEach((b) => b.onclick = () => { S.category = S.category === b.dataset.rail ? null : b.dataset.rail; S.offset = 0; renderCats(); loadTx(); });
+}
+// numbers for whatever the table is currently showing
+function renderTxStats() {
+  const el = $("#txstats");
+  if (!el) return;
+  const t = S.tx, s = S.stats, filtered = S.day || S.category || S.q || S.need || S.review;
+  el.innerHTML = ribbon([
+    { k: filtered ? "Matching" : "Purchases", v: t.count, d: S.day ? fmtDay(S.day) : s.label },
+    { k: "Total", v: money(t.total), d: filtered ? `${s.total ? Math.round((t.total / s.total) * 100) : 0}% of the month` : `of ${money(s.budget || 0, true)} budget` },
+    { k: "Average", v: money(t.count ? t.total / t.count : 0), d: "per purchase" },
+    { k: "Optional", v: money(s.optional, true), d: s.total > 0 ? `${Math.round((s.optional / s.total) * 100)}% of ${esc(s.label.split(" ")[0])}` : "nothing yet" },
+    { k: "To review", v: s.review_count || 0, d: s.review_count ? "AI picks to confirm" : "all confirmed", tone: s.review_count ? "warned" : "" },
+  ]);
+}
+// everything about the chosen purchase, or the sum when several are ticked
+function renderInspector() {
+  const el = $("#txinsp");
+  if (!el) return;
+  const picked = [...S.sel.values()];
+  if (picked.length > 1) {
+    const sum = picked.reduce((a, x) => a + x, 0);
+    el.innerHTML = `<div class="ins-many"><div class="note">${picked.length} purchases selected</div><div class="v num">${money(sum)}</div>
+      <div class="dl"><span>Average</span><span class="num">${money(sum / picked.length)}</span></div>
+      <div class="dl"><span>Share of month</span><span class="num">${S.stats.total ? Math.round((sum / S.stats.total) * 100) : 0}%</span></div></div>`;
+    return;
+  }
+  const i = S.tx.items.find((x) => x.id === S.pick) || S.tx.items[0];
+  if (!i) { el.innerHTML = `<div class="ins-empty">Pick a purchase to see its details</div>`; return; }
+  S.pick = i.id;
+  document.querySelectorAll("#txcard .tr[data-id]").forEach((r) => r.classList.toggle("cur", +r.dataset.id === i.id));
+  const c = col(i.color), [tone, label] = txStatus(i);
+  const via = { recurring: "Recurring", manual: "Added manually", bank: "From statement", import: "Imported", tap: "Apple Pay" }[i.source] || i.source;
+  const row = (k, v) => (v ? `<div class="dl"><span>${k}</span><span class="num">${v}</span></div>` : "");
+  const conf = i.category_source === "ai" && i.category_confidence != null ? `<span class="conf"><i><u style="width:${Math.round(i.category_confidence * 100)}%"></u></i>${Math.round(i.category_confidence * 100)}%</span>` : "";
+  const needBy = { ai: "AI's call", category: "from category", user: "your call" }[i.need_source] || "not rated";
+  el.innerHTML = `<div class="ins-top" style="--c:${c}">
+      <div class="ins-who"><span class="ins-logo" style="background:${c}">${esc([...i.merchant.trim()][0]?.toUpperCase() || "?")}</span><div><b>${esc(i.merchant)}</b><small>${fmtDay(i.date, { weekday: "long", month: "short", day: "numeric" })}</small></div></div>
+      <div class="ins-amt num ${i.amount < 0 ? "pos" : ""}">${i.fx_pending ? "…" : `${i.amount < 0 ? "+" : "−"}${money(Math.abs(i.amount))}`}</div>
+      <div class="ins-sub"><span class="tag ${tone}">${label}</span><span class="tag">${esc(via)}</span></div></div>
+    <div class="ins-body">
+      <div class="dl"><span>Category</span><button class="pill" id="inscat" style="--c:${c}"><i class="dot" style="background:${c}"></i>${esc(i.category)}</button></div>
+      ${row("AI confidence", conf)}
+      <div class="dl"><span>Usually</span><div class="ins-need"><button data-ineed="1" class="${i.need === true ? "on" : ""}" title="${needBy}">Need</button><button data-ineed="0" class="${i.need === false ? "on" : ""}" title="${needBy}">Want</button></div></div>
+      ${row("Time", i.source === "bank" ? "" : fmtTime(i.ts))}
+      ${row("Card", esc(i.card))}
+      ${row("Charged in", esc(fxText(i)))}
+      ${row("Card charged", i.shared ? money(i.full_amount) : "")}
+      ${row("Your share", i.shared ? money(i.amount) : "")}
+      ${row("Still owed", i.owed ? money(i.owed) : "")}
+      ${row("Note", esc(i.note))}
+    </div>
+    <div class="ins-hist" id="inshist"></div>
+    <div class="ins-foot"><button class="btn secondary" id="insedit">Edit or split</button></div>`;
+  merchantHistory(i);
+  $("#inscat").onclick = (e) => { e.stopPropagation(); catPicker(e.currentTarget, i); };
+  $("#insedit").onclick = () => openTxModal(i);
+  el.querySelectorAll("[data-ineed]").forEach((b) => b.onclick = async () => {
+    const need = b.dataset.ineed === "1";
+    await api(`/tx/${i.id}`, { method: "PATCH", body: { need } });
+    toast(`“${i.merchant}” counts as ${need ? "essential" : "optional"}`);
+    await loadMonth();
+  });
+}
+// every purchase at this merchant, however old; a search only, so it can arrive late
+let histSeq = 0;
+async function merchantHistory(i) {
+  const seq = ++histSeq, cached = S.hist[i.merchant];
+  const r = cached || await api(`/tx?${new URLSearchParams({ q: i.merchant, limit: 5 })}`).catch(() => null);
+  const el = $("#inshist");
+  if (!r || !el || seq !== histSeq) return;
+  S.hist[i.merchant] = r;
+  el.innerHTML = `<h3><span>All time here</span><b class="num">${r.count} × · ${money(r.total, true)}</b></h3>` +
+    r.items.map((x) => `<div class="hrow num ${x.id === i.id ? "me" : ""}"><span>${fmtDay(x.date, { month: "short", day: "numeric", year: "numeric" })}</span><span>${money(x.amount)}</span></div>`).join("");
 }
 function filterPop(anchor) {
   closePop();
@@ -1665,38 +2341,93 @@ async function importPreview(req, fname) {
 }
 
 // ---------- recurring ----------
+// every date this schedule falls on between two days, both included
+function occurrences(x, from, to) {
+  const out = [];
+  if (x.freq === "monthly") {
+    let ym = from.slice(0, 7);
+    while (ym <= to.slice(0, 7)) {
+      const [y, m] = ym.split("-").map(Number), dim = new Date(y, m, 0).getDate();
+      const d = `${ym}-${String(Math.min(x.day, dim)).padStart(2, "0")}`;
+      if (d >= from && d <= to) out.push(d);
+      ym = shiftYm(ym, 1);
+    }
+    return out;
+  }
+  if (!x.anchor) return out;
+  const step = x.freq === "weekly" ? 7 : 14;
+  for (let d = x.anchor; d <= to; d = addDays(d, step)) if (d >= from) out.push(d);
+  return out;
+}
 function renderRecurring() {
-  const r = [...S.recurring].sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "income" ? -1 : 1));
+  const el = $("#reccard");
+  if (!el) return;
+  const r = [...S.recurring].sort((a, b) => (a.kind === b.kind ? b.amount - a.amount : a.kind === "income" ? -1 : 1));
   const perMonth = (x) => x.amount * (x.freq === "weekly" ? 52 / 12 : x.freq === "biweekly" ? 26 / 12 : 1);
-  const total = (k) => r.filter((x) => x.active && x.kind === k).reduce((a, x) => a + perMonth(x), 0);
+  const live = r.filter((x) => x.active), paused = r.filter((x) => !x.active);
+  const total = (k) => live.filter((x) => x.kind === k).reduce((a, x) => a + perMonth(x), 0);
   const inc = total("income"), sp = total("spend");
-  $("#rec").innerHTML = r.length ? r.map((x) => {
-    const c = S.cats.find((c) => c.name === x.category);
-    const dot = x.kind === "income" ? "var(--good)" : col(c?.color);
-    return `<div class="rec ${x.active ? "" : "paused"}">
-      <div><span style="display:flex;align-items:center;gap:8px"><i class="dot" style="background:${dot}"></i><b style="font-weight:550">${esc(x.name)}</b></span>
-      <small>${esc(freqText(x))}${x.active ? "" : " · paused"}</small></div>
+  const today = localToday(), ym = today.slice(0, 7), [y, m] = ym.split("-").map(Number), dim = new Date(y, m, 0).getDate();
+  const monthEnd = `${ym}-${String(dim).padStart(2, "0")}`;
+  const thisMonth = live.flatMap((x) => occurrences(x, `${ym}-01`, monthEnd).map((date) => ({ x, date }))).sort((a, b) => a.date.localeCompare(b.date));
+  const upcoming = live.flatMap((x) => occurrences(x, today, addDays(today, 30)).map((date) => ({ x, date }))).sort((a, b) => a.date.localeCompare(b.date));
+  const done = thisMonth.filter((o) => o.date < today).reverse();
+  const stillOut = thisMonth.filter((o) => o.date >= today && o.x.kind === "spend").reduce((a, o) => a + o.x.amount, 0);
+  const stillIn = thisMonth.filter((o) => o.date >= today && o.x.kind === "income").reduce((a, o) => a + o.x.amount, 0);
+  const nextOut = upcoming.find((o) => o.x.kind === "spend");
+  const inDays = (d) => { const n = -daysAgo(d); return n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`; };
+  const dot = (x) => { const c = S.cats.find((k) => k.name === x.category); return x.kind === "income" ? "var(--good)" : c ? col(c.color) : "var(--gold)"; };
+  const sign = (x) => (x.kind === "income" ? "+" : "−");
+  const marks = thisMonth.map((o) => {
+    const left = ((+o.date.slice(8) - 1) / Math.max(1, dim - 1)) * 100, past = o.date < today;
+    return `<span class="rm ${o.x.kind} ${past ? "done" : ""}" style="left:${left}%;--c:${dot(o.x)}" data-tip="${esc(o.x.name)} · ${fmtDay(o.date, { month: "short", day: "numeric" })} · ${sign(o.x)}${money(o.x.amount)}${past ? " · logged" : ""}"></span>`;
+  }).join("");
+  const nowAt = ((+today.slice(8) - 1) / Math.max(1, dim - 1)) * 100;
+  const days = [1, 5, 10, 15, 20, 25, dim].map((d) => `<span style="left:${((d - 1) / Math.max(1, dim - 1)) * 100}%">${d}</span>`).join("");
+  const line = (o, status) => `<div class="uline ${o.x.kind}">${dateTile(o.date)}
+      <div class="um"><b>${esc(o.x.name)}</b><small>${status}</small></div>
+      <span class="num ${o.x.kind === "income" ? "pos" : ""}">${sign(o.x)}${money(o.x.amount)}</span></div>`;
+  const sched = (list, title, sum) => list.length ? `<div class="sc-h"><span>${title}</span><b class="num">${money(sum, true)}/mo</b></div>` + list.map((x) => `<div class="sline"><i class="dot" style="background:${dot(x)}"></i>
+      <div class="um"><b>${esc(x.name)}</b><small>${esc(freqText(x))}</small></div>
+      <span class="sshare"><u style="width:${pct100((perMonth(x) / Math.max(1, sum)) * 100)}%;background:${dot(x)}"></u></span>
       <span class="num ${x.kind === "income" ? "pos" : ""}">${x.kind === "income" ? "+" : ""}${money(x.amount)}</span>
-      <button class="ghost" data-rec="${x.id}" aria-label="Edit">⋯</button></div>`;
-  }).join("") + `<div class="note" style="margin-top:8px">${[inc ? `<span class="pos">+${money(inc, true)}</span> in` : "", sp ? `${money(sp, true)} out` : ""].filter(Boolean).join(" · ")} per month (weekly ≈ ×4.33)</div>`
-    : `<div class="empty" style="padding:12px 0">Paycheque, gym, iCloud, phone… add them once and they're logged automatically.</div>`;
+      <button class="more3" data-rec="${x.id}" aria-label="Edit ${esc(x.name)}">•••</button></div>`).join("") : "";
   const subs = S.subs || [];
   const per = { weekly: "weekly", biweekly: "every 2 weeks", monthly: "monthly" };
-  if (subs.length) $("#rec").innerHTML += `<div class="acc-group"><span>Looks like a subscription</span><span>${subs.length}</span></div>` +
-    subs.map((x) => `<div class="sugg"><div><b style="font-weight:550">${esc(x.name)}</b>
-      <small>${money(x.amount)} ${per[x.freq]} · ${x.charges} charges since ${fmtDay(x.first, { month: "short", day: "numeric" })} · next ~${fmtDay(x.next, { month: "short", day: "numeric" })}</small></div>
-      <button class="btn secondary" data-sacc="${esc(x.merchant_key)}" style="padding:4px 10px">Add</button>
-      <button class="ghost" data-sdis="${esc(x.merchant_key)}" aria-label="Not a subscription" title="Not a subscription">✕</button></div>`).join("") +
-    `<div class="note" style="margin-top:6px">Found from repeat charges${S.settings.ai_enabled ? ", checked by AI" : ""}. Add logs it from the next charge on.</div>`;
-  $("#rec").querySelectorAll("[data-rec]").forEach((el) => el.onclick = () => openRecModal(r.find((x) => x.id === +el.dataset.rec)));
-  $("#rec").querySelectorAll("[data-sacc]").forEach((el) => el.onclick = async () => {
-    const x = subs.find((s) => s.merchant_key === el.dataset.sacc);
+  el.innerHTML = `<div class="ribbon">${ribbon([
+      { k: "Coming in", v: `+${money(inc, true)}`, d: "per month (weekly ≈ ×4.33)", tone: "pos" },
+      { k: "Going out", v: money(sp, true), d: `${live.filter((x) => x.kind === "spend").length} active payments` },
+      { k: "Left after bills", v: signed(inc - sp, true), d: inc ? `${Math.round((sp / inc) * 100)}% of income is committed` : "no recurring income", tone: inc - sp >= 0 ? "pos" : "up" },
+      { k: "Still to pay", v: money(stillOut, true), d: `by ${fmtDay(monthEnd, { month: "short", day: "numeric" })}${stillIn ? ` · +${money(stillIn, true)} to come` : ""}` },
+      { k: "Next payment", v: nextOut ? inDays(nextOut.date) : "—", d: nextOut ? `${esc(nextOut.x.name)} · ${money(nextOut.x.amount)}` : "nothing scheduled" },
+    ])}</div>
+    <section class="card lift rec-rail"><div class="chart-h"><h2>${fmtDay(`${ym}-15`, { month: "long" })} at a glance</h2><span class="legendrow" style="margin:0"><span><i class="dot" style="background:var(--good)"></i>Income</span><span><i class="dot" style="background:var(--gold)"></i>Payment</span><span><i class="dot hollow"></i>Logged</span></span>
+        <button class="btn dark" id="addrec" style="margin-left:auto">${ICON.plus}Add recurring</button></div>
+      <div class="rail"><div class="rail-line"><i style="width:${nowAt}%"></i></div><span class="rnow" style="left:${nowAt}%"><em>Today</em></span>${marks}</div><div class="rail-days num">${days}</div></section>
+    <div class="rec-cols">
+      <section class="card rc"><h2>Upcoming <span class="right note">next 30 days</span></h2><div class="rc-b">${upcoming.map((o) => line(o, inDays(o.date))).join("") || `<div class="empty" style="padding:12px 0">Nothing due in the next 30 days.</div>`}</div></section>
+      <section class="card rc rc-mid"><h2>Active schedule <span class="right note num">${live.length}</span></h2>
+        ${inc ? `<div class="commit">${gauge((sp / inc) * 100, "var(--gold)", null, `${Math.round((sp / inc) * 100)}%`, "committed", 104)}<div><div class="note-h">Of what comes in every month</div><div class="commit-v num">${money(sp, true)} <small>of ${money(inc, true)}</small></div><div class="splitbar"><i style="width:${pct100((sp / inc) * 100)}%;background:var(--gold)"></i><i style="flex:1;background:var(--accent)"></i></div><div class="note-h num" style="margin-top:4px">${money(inc - sp, true)} free after recurring payments</div></div></div>` : ""}
+        <div class="rc-b">${r.length ? sched(live.filter((x) => x.kind === "income"), "Income", inc) + sched(live.filter((x) => x.kind === "spend"), "Payments", sp) : `<div class="empty" style="padding:12px 0">Paycheque, gym, iCloud, phone… add them once and they're logged automatically.</div>`}
+        ${paused.length ? `<div class="sc-h"><span>Paused</span><b class="num">${paused.length}</b></div>${paused.map((x) => `<div class="sline paused"><i class="dot" style="background:var(--axis)"></i><div class="um"><b>${esc(x.name)}</b><small>${esc(freqText(x))} · paused</small></div><span></span><span class="num">${money(x.amount)}</span><button class="more3" data-rec="${x.id}" aria-label="Edit ${esc(x.name)}">•••</button></div>`).join("")}` : ""}</div></section>
+      <section class="card rc"><h2>Done this month <span class="right note num">${done.length}</span></h2><div class="rc-b">${done.map((o) => line(o, "logged")).join("") || `<div class="note">Nothing logged yet this month.</div>`}
+        ${subs.length ? `<div class="sc-h" style="margin-top:12px"><span>Looks like a subscription</span><b class="num">${subs.length}</b></div>` + subs.map((x) => `<div class="sugg"><div><b style="font-weight:500">${esc(x.name)}</b>
+          <small>${money(x.amount)} ${per[x.freq]} · ${x.charges} charges since ${fmtDay(x.first, { month: "short", day: "numeric" })} · next ~${fmtDay(x.next, { month: "short", day: "numeric" })}</small></div>
+          <button class="btn secondary" data-sacc="${esc(x.merchant_key)}" style="padding:4px 10px">Add</button>
+          <button class="ghost" data-sdis="${esc(x.merchant_key)}" aria-label="Not a subscription" title="Not a subscription">✕</button></div>`).join("") +
+        `<div class="note" style="margin-top:6px">Found from repeat charges${S.settings.ai_enabled ? ", checked by AI" : ""}. Add logs it from the next charge on.</div>` : ""}</div></section>
+    </div>`;
+  $("#addrec").onclick = () => openRecModal();
+  el.querySelectorAll("[data-tip]").forEach((x) => hoverTip(x, () => x.dataset.tip));
+  el.querySelectorAll("[data-rec]").forEach((b) => b.onclick = () => openRecModal(r.find((x) => x.id === +b.dataset.rec)));
+  el.querySelectorAll("[data-sacc]").forEach((b) => b.onclick = async () => {
+    const x = subs.find((s) => s.merchant_key === b.dataset.sacc);
     await api(`/subscriptions/${encodeURIComponent(x.merchant_key)}/accept`, { method: "POST" });
     toast(`${x.name} added as recurring`); refreshAll();
   });
-  $("#rec").querySelectorAll("[data-sdis]").forEach((el) => el.onclick = async () => {
-    await api(`/subscriptions/${encodeURIComponent(el.dataset.sdis)}/dismiss`, { method: "POST" });
-    S.subs = subs.filter((s) => s.merchant_key !== el.dataset.sdis); renderRecurring();
+  el.querySelectorAll("[data-sdis]").forEach((b) => b.onclick = async () => {
+    await api(`/subscriptions/${encodeURIComponent(b.dataset.sdis)}/dismiss`, { method: "POST" });
+    S.subs = subs.filter((s) => s.merchant_key !== b.dataset.sdis); renderRecurring();
   });
 }
 const ordinal = (n) => n + (["th", "st", "nd", "rd"][(n % 100 - 20) % 10] || ["th", "st", "nd", "rd"][n % 100] || "th");
@@ -1765,68 +2496,77 @@ function openRecModal(rec) {
 }
 
 // ---------- settings ----------
-function openSettings() {
-  const s = S.settings;
-  const catRows = () => S.cats.map((c) => `<div class="cat-edit" data-name="${esc(c.name)}">
-      <button type="button" class="swatch" style="background:${col(c.color)}" aria-label="Color" ${c.name === "Other" ? "disabled" : ""}></button>
+function renderSettings() {
+  const el = $("#v-settings"), s = S.settings;
+  if (!el || !S.cats) return;
+  const used = S.cats.filter((c) => c.name !== "Other").length;
+  const stat = Object.fromEntries((S.stats?.categories || []).map((c) => [c.name, c]));
+  const catRows = () => `<div class="cat-edit head"><span></span><span>Name</span><span>Budget</span><span>${esc(S.stats?.label.split(" ")[0] || "")}</span><span></span></div>` + S.cats.map((c) => `<div class="cat-edit" data-name="${esc(c.name)}">
+      <button type="button" class="swatch" style="background:${col(c.color)}" aria-label="Color for ${esc(c.name)}" ${c.name === "Other" ? "disabled" : ""}></button>
       <input value="${esc(c.name)}" class="cname" aria-label="Category name" ${c.name === "Other" ? "disabled" : ""}>
-      ${c.name === "Other" ? "<span></span>" : `<button type="button" class="ghost cdel" aria-label="Delete">✕</button>`}
+      <span class="num">${stat[c.name]?.budget ? money(stat[c.name].budget, true) : "—"}</span>
+      <span class="num">${stat[c.name]?.total ? money(stat[c.name].total, true) : "—"}</span>
+      ${c.name === "Other" ? "<span></span>" : `<button type="button" class="ghost cdel" aria-label="Delete ${esc(c.name)}">✕</button>`}
     </div>`).join("");
-  modal(`<h3>Settings</h3>
-    <label class="field"><span>Income goes into (unless you pick another account)</span><select id="incacc">${accOptions(s.income_account)}</select></label>
-    <div class="field"><span>Categories · color, name (budgets: Categories card → Budgets)</span><div id="ced">${catRows()}</div>
-      <div style="display:flex;gap:8px;margin-top:6px"><input id="newcat" placeholder="New category" style="flex:1;background:var(--field);border:0;border-radius:8px;padding:8px"><button type="button" class="btn secondary" id="addcat">Add</button></div></div>
-    <p class="note">Auto-categorizing: ${s.ai_enabled ? `on (${esc(s.ai_model)}). New merchants get a category automatically; ones it's unsure about (under ${Math.round((s.ai_review_below || 0.75) * 100)}%) are marked AI? for you to confirm. Your corrections always win.` : "keyword rules only. Add OPENAI_API_KEY (or ANTHROPIC_API_KEY) to the server's .env to turn on AI."}</p>
-    <p class="note">Weekly summary: ${s.weekly_summary ? `on. A push notification every Sunday at 7pm with the week's spending, budgets and what needs doing. <a href="#" id="wktest">Send one now</a>` : "off. Set NTFY_URL and NTFY_TOKEN in the server's .env to turn it on."}</p>
-    ${s.trusted_device ? `<p class="note">This device is trusted: it opens without a token over Tailscale. To change that, edit TRUSTED_DEVICES in the server's .env.</p>` : ""}
-    <div class="actions">${s.trusted_device ? `<span class="left"></span>` : `<button type="button" class="btn secondary left" id="logout">Sign out</button>`}
-      <button type="button" class="btn secondary" id="theme">${isDark() ? "Light" : "Dark"} mode</button>
-      <button type="button" class="btn" id="save">Save</button></div>`, (m) => {
-    const bind = () => {
-      m.querySelectorAll(".cdel").forEach((b) => b.onclick = async () => {
-        const name = b.closest(".cat-edit").dataset.name;
-        if (!confirm(`Delete “${name}”? Its purchases move to Other.`)) return;
-        await api(`/categories/${encodeURIComponent(name)}`, { method: "DELETE" });
-        S.cats = await api("/categories"); refreshAll(); $("#ced", m).innerHTML = catRows(); bind();
-      });
-      m.querySelectorAll(".swatch:not([disabled])").forEach((b) => b.onclick = (e) => {
-        e.stopPropagation(); closePop();
-        const name = b.closest(".cat-edit").dataset.name;
-        const pop = document.createElement("div"); pop.className = "pop"; pop.style.width = "auto";
-        pop.innerHTML = `<div class="swatches">${PALETTE.map((p, i) => `<button class="swatch" data-c="${p[0]}" aria-label="Color ${i + 1}" style="background:${isDark() ? p[1] : p[0]}"></button>`).join("")}</div>`;
-        document.body.appendChild(pop);
-        const r = b.getBoundingClientRect(); pop.style.top = r.bottom + 6 + "px"; pop.style.left = r.left + "px";
-        pop.querySelectorAll("[data-c]").forEach((x) => x.onclick = async () => {
-          closePop(); await api(`/categories/${encodeURIComponent(name)}`, { method: "PATCH", body: { color: x.dataset.c } });
-          S.cats = await api("/categories"); refreshAll(); $("#ced", m).innerHTML = catRows(); bind();
-        });
-      });
-    };
-    bind();
-    $("#addcat", m).onclick = async () => {
-      const n = $("#newcat", m).value.trim(); if (!n) return;
-      await api("/categories", { method: "POST", body: { name: n } });
-      S.cats = await api("/categories"); refreshAll(); $("#ced", m).innerHTML = catRows(); $("#newcat", m).value = ""; bind();
-    };
-    const wt = $("#wktest", m); if (wt) wt.onclick = async (e) => {
-      e.preventDefault(); wt.textContent = "Sending…";
-      try { await api("/summary/weekly/send", { method: "POST" }); toast("Sent. Check your phone"); } finally { wt.textContent = "Send one now"; }
-    };
-    const lo = $("#logout", m); if (lo) lo.onclick = () => { store.del("spend_token"); TOKEN = ""; closeModal(); renderLogin(); };
-    $("#theme", m).onclick = () => { const t = isDark() ? "light" : "dark"; document.documentElement.dataset.theme = t; store.set("spend_theme", t); closeModal(); refreshAll(); };
-    $("#save", m).onclick = async () => {
-      await api("/settings", { method: "PUT", body: { income_account: +$("#incacc", m).value || null } });
-      for (const row of m.querySelectorAll(".cat-edit")) {
-        const name = row.dataset.name;
-        const newName = $(".cname", row).value.trim();
-        const body = {};
-        if (newName && newName !== name) body.new_name = newName;
-        if (Object.keys(body).length) await api(`/categories/${encodeURIComponent(name)}`, { method: "PATCH", body });
-      }
-      S.settings = await api("/settings");
-      closeModal(); toast("Saved"); refreshAll();
-    };
+  el.innerHTML = `<div class="set-grid">
+    <section class="card lift set-cats">
+      <div class="set-h"><div><h2>Categories</h2><p class="note">Color and name. Colors stay with the category everywhere in the app. Budgets are under <a href="#budgets">Budgets</a>.</p></div><span class="tag num">${used + 1}</span></div>
+      <div id="ced">${catRows()}</div>
+      <div class="set-add"><input id="newcat" placeholder="New category" aria-label="New category"><button type="button" class="btn dark" id="addcat">${ICON.plus}Add</button></div>
+    </section>
+    <div class="set-side">
+      <section class="card set-row"><div class="set-t"><h2>Appearance</h2><p class="note">Stored on this device.</p></div>
+        <div class="seg2 set-seg"><button id="sdark" class="${isDark() ? "on" : ""}">Dark</button><button id="slight" class="${isDark() ? "" : "on"}">Light</button></div></section>
+      <section class="card set-row"><div class="set-t"><h2>Income goes into</h2><p class="note">Used unless you pick another account.</p></div>
+        <select id="incacc" class="pick wide" aria-label="Income goes into">${accOptions(s.income_account)}</select></section>
+      <section class="card set-block"><div class="set-t"><h2>Auto-categorizing</h2><span class="tag ${s.ai_enabled ? "good" : ""}">${s.ai_enabled ? "On" : "Rules only"}</span></div>
+        <p class="note">${s.ai_enabled ? `Running on ${esc(s.ai_model)}. New merchants get a category automatically; ones it's unsure about (under ${Math.round((s.ai_review_below || 0.75) * 100)}%) are marked AI? for you to confirm. Your corrections always win.` : "Keyword rules only. Add OPENAI_API_KEY (or ANTHROPIC_API_KEY) to the server's .env to turn on AI."}</p></section>
+      <section class="card set-block"><div class="set-t"><h2>Weekly summary</h2><span class="tag ${s.weekly_summary ? "good" : ""}">${s.weekly_summary ? "On" : "Off"}</span></div>
+        <p class="note">${s.weekly_summary ? "A push notification every Sunday at 7pm with the week's spending, budgets and what needs doing." : "Set NTFY_URL and NTFY_TOKEN in the server's .env to turn it on."}</p>
+        ${s.weekly_summary ? `<button type="button" class="btn dark" id="wktest">Send one now</button>` : ""}</section>
+      <section class="card set-block"><div class="set-t"><h2>This device</h2><span class="tag">${s.trusted_device ? "Trusted" : "Signed in"}</span></div>
+        <p class="note">${s.trusted_device ? "This device opens without a token over Tailscale. To change that, edit TRUSTED_DEVICES in the server's .env." : "Your API token is stored in this browser only."}</p>
+        ${s.trusted_device ? "" : `<button type="button" class="btn dark" id="logout">Sign out</button>`}</section>
+    </div></div>`;
+  const reload = async () => { S.cats = await api("/categories"); await refreshAll(); renderSettings(); };
+  el.querySelectorAll(".cdel").forEach((b) => b.onclick = async () => {
+    const name = b.closest(".cat-edit").dataset.name;
+    if (!confirm(`Delete “${name}”? Its purchases move to Other.`)) return;
+    await api(`/categories/${encodeURIComponent(name)}`, { method: "DELETE" });
+    await reload();
   });
+  el.querySelectorAll(".cname:not([disabled])").forEach((i) => i.onchange = async () => {
+    const name = i.closest(".cat-edit").dataset.name, next = i.value.trim();
+    if (!next || next === name) { i.value = name; return; }
+    await api(`/categories/${encodeURIComponent(name)}`, { method: "PATCH", body: { new_name: next } });
+    toast("Saved"); await reload();
+  });
+  el.querySelectorAll(".swatch:not([disabled])").forEach((b) => b.onclick = (e) => {
+    e.stopPropagation(); closePop();
+    const name = b.closest(".cat-edit").dataset.name;
+    const pop = document.createElement("div"); pop.className = "pop"; pop.style.width = "auto";
+    pop.innerHTML = `<div class="swatches">${PALETTE.map((p, i) => `<button class="swatch" data-c="${p[0]}" aria-label="Color ${i + 1}" style="background:${isDark() ? p[1] : p[0]}"></button>`).join("")}</div>`;
+    document.body.appendChild(pop);
+    const r = b.getBoundingClientRect(); pop.style.top = r.bottom + 6 + "px"; pop.style.left = r.left + "px";
+    pop.querySelectorAll("[data-c]").forEach((x) => x.onclick = async () => {
+      closePop(); await api(`/categories/${encodeURIComponent(name)}`, { method: "PATCH", body: { color: x.dataset.c } });
+      await reload();
+    });
+  });
+  $("#addcat").onclick = async () => {
+    const n = $("#newcat").value.trim(); if (!n) return;
+    await api("/categories", { method: "POST", body: { name: n } });
+    await reload();
+  };
+  $("#newcat").onkeydown = (e) => { if (e.key === "Enter") $("#addcat").click(); };
+  $("#incacc").onchange = async (e) => { await api("/settings", { method: "PUT", body: { income_account: +e.target.value || null } }); S.settings = await api("/settings"); toast("Saved"); };
+  const theme = (t) => () => { $("#" + (t === "dark" ? "tdark" : "tlight")).click(); renderSettings(); };
+  $("#sdark").onclick = theme("dark"); $("#slight").onclick = theme("light");
+  const wt = $("#wktest"); if (wt) wt.onclick = async () => {
+    wt.textContent = "Sending…";
+    try { await api("/summary/weekly/send", { method: "POST" }); toast("Sent. Check your phone"); } finally { wt.textContent = "Send one now"; }
+  };
+  const lo = $("#logout"); if (lo) lo.onclick = () => { store.del("spend_token"); TOKEN = ""; renderLogin(); };
 }
 
 // ---------- tooltip ----------
