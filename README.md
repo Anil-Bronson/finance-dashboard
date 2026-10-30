@@ -27,6 +27,8 @@ cash, anything else ──▶ "+ Add" in the dashboard ─────┘       
 - Both are remembered per device, so hiding on the Mac doesn't hide on the phone.
 
 ### Dashboard
+The app fills the window. Each sidebar item is its own tab (Dashboard, Analytics, Transactions, Budgets, Accounts, Recurring, Income), and the page itself never scrolls. A tab scrolls only if it doesn't fit, and it stops at its end. The transaction table shows as many rows as fit.
+
 - **Top of the page:** net worth, income and expenses against last month, plus an alert line for the worst budget or the biggest jump.
 - **My Cards and Spending:** your cards and their balances (tap to see the next one), then spent so far against your budget, with the outlined bar marking an even pace.
 - **Month stats:** the daily average, a projected month-end, and a comparison with last month. **Optional (wants)** shows how much of the month was optional; tap it to list every optional purchase.
@@ -41,7 +43,7 @@ cash, anything else ──▶ "+ Add" in the dashboard ─────┘       
 - **Cash Flow Overview:** income and spending lines, Monthly (Jan–Dec), Weekly or Daily. Tap a month to open it, or a day to see its purchases.
 - **Top merchants and Recurring:** your repeating payments and income, plus **"Looks like a subscription"** suggestions.
 - **Settings:** category names and colors, and the default income account. The moon/sun switch in the header picks dark (the default) or light.
-- `?month=2026-09` in the URL opens a specific month.
+- `?month=2026-09` in the URL opens a specific month, and `#transactions` (or any tab's name) opens that tab.
 
 ### How money gets in
 | Source | How |

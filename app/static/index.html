@@ -20,7 +20,7 @@
   --shadow: none; --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --r-sm: 8px; --r-md: 10px; --r-lg: 14px; --gap: 16px; --pad: 16px; --side: 260px;
-  --back-a: #cfe6e6; --back-b: #8fd0d4; --back-c: #d7e6e6; --side-line: #e4e4df;
+  --side-line: #e4e4df;
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -32,7 +32,7 @@
   --heat-0: #1c1c1c; --heat-1: #103236; --heat-2: #14505a; --heat-3: #1c7a86; --heat-4: #3aa9b8; --heat-5: #7fe3ef;
   --card-a: #262626; --card-b: #181818; --face-a: #3b3b3b; --face-b: #262626; --face-ink: #8b8b8b; --tile-a: #3a3a3a; --tile-b: #262626;
   --glow: #254c68; --glow-edge: #3f7f97; --tooltip: #2a2a2a; --heat-top: #06262b;
-  --back-a: #aececf; --back-b: #32a0a6; --back-c: #0e3a40; --side-line: #0a0a0a;
+  --side-line: #0a0a0a;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -46,16 +46,14 @@ button { cursor: pointer; }
 a { color: var(--link); }
 .num { font-variant-numeric: tabular-nums; }
 
-/* backdrop around the app window */
-body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: linear-gradient(to top, var(--back-a) 0, var(--back-b) 7%, var(--back-c) 16%, transparent 27%); }
-body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height: 100%; z-index: -1; opacity: .55;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cg fill='%233f8c78'%3E%3Crect x='3' y='3' width='4' height='4'/%3E%3Crect x='23' y='3' width='4' height='4' opacity='.5'/%3E%3Crect x='13' y='13' width='4' height='4' opacity='.35'/%3E%3Crect x='33' y='23' width='4' height='4' opacity='.7'/%3E%3Crect x='3' y='33' width='4' height='4' opacity='.3'/%3E%3C/g%3E%3C/svg%3E");
-  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 55%); mask-image: linear-gradient(to bottom, #000, transparent 55%); }
-.wrap { padding: clamp(0px, 5.5vw, 88px) clamp(0px, 5vw, 80px); }
-.app { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); max-width: 1760px; margin: 0 auto; background: linear-gradient(to right, var(--surface) calc(var(--side) - 1px), var(--side-line) 0, var(--side-line) var(--side), var(--frame) 0); }
+/* the app is exactly the window; only a tab's own content may scroll, and it stops at its end */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+#app, .wrap { height: 100%; height: 100dvh; }
+.app { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); height: 100%; background: var(--frame); }
 
 /* sidebar */
-.side { position: sticky; top: 0; align-self: start; height: 100vh; max-height: 1024px; overflow-y: auto; display: flex; flex-direction: column; padding: 28px 20px 20px; }
+.side { height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: none; display: flex; flex-direction: column; padding: 28px 20px 20px; background: var(--surface); border-right: 1px solid var(--side-line); }
+.tabs { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .brand { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 24px; }
 .mark { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #0c2a30; background: linear-gradient(135deg, #8ff0f4, #33b6c9); flex: none; }
 .who { display: grid; grid-template-columns: 32px minmax(0, 1fr) 24px; gap: 8px; align-items: center; min-height: 56px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--edge); background: linear-gradient(180deg, var(--card-a), var(--card-b)); }
@@ -79,8 +77,12 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .promo button { width: 100%; height: 34px; border: 0; border-radius: var(--r-sm); background: #141414; color: #fff; font-size: 13px; }
 
 /* main column */
-.main { min-width: 0; padding: 19px 20px 24px; display: flex; flex-direction: column; gap: var(--gap); background: var(--frame); }
-.top { display: flex; align-items: center; gap: 12px; min-height: 34px; margin-bottom: 3px; }
+.main { min-width: 0; height: 100%; min-height: 0; display: flex; flex-direction: column; background: var(--frame); }
+.view { display: none; flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: none; flex-direction: column; gap: var(--gap); padding: 16px 20px 20px; }
+.view.on { display: flex; }
+.view > * { flex: none; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--gap); align-items: start; }
+.top { display: flex; align-items: center; gap: 12px; min-height: 34px; padding: 19px 20px 0; flex: none; }
 .top h1 { font-size: 21px; font-weight: 400; margin: 0; letter-spacing: -.005em; }
 .topsearch { margin-left: auto; position: relative; width: 240px; }
 .topsearch input { width: 100%; height: 34px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--field); padding: 0 56px 0 32px; outline: none; font-size: 13.5px; }
@@ -95,7 +97,6 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .themesw button { width: 28px; height: 26px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--ink-3); border-radius: 7px; }
 .themesw button.on { background: var(--raised); color: var(--ink); }
 .alert { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 14px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--field); font-size: 14px; color: var(--ink-2); }
-.alert { margin-bottom: 4px; }
 .alert svg { flex: none; color: var(--ink-2); }
 .alert b { font-weight: 600; color: var(--ink); }
 .alert .msg { min-width: 0; }
@@ -112,6 +113,7 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .kebab { margin-left: auto; background: none; border: 0; color: var(--ink-3); padding: 2px 6px; border-radius: 6px; line-height: 1; }
 .kebab:hover { color: var(--ink); background: var(--raised); }
 .kpi-v { font-size: 25px; font-weight: 600; letter-spacing: -.01em; line-height: 1.1; margin-top: 14px; white-space: nowrap; }
+.kpi-f span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kpi-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; padding: 6px 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-2); }
 .badge { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; border: 1px solid transparent; }
 .badge.good { background: var(--good-bg); color: var(--good-ink); border-color: rgba(120,220,110,.18); }
@@ -127,17 +129,18 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .stack { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
 .stack > .grow { flex: 1; }
 /* when the Cash flow + Recurring column is taller, the net worth chart takes up the slack */
-#chartcard { flex: 1; display: flex; flex-direction: column; }
-.chart { flex: 1; min-height: 232px; }
+#chartcard { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.chart { flex: 1; min-height: 150px; }
+.view > #txcard { flex: 1 1 0; min-height: 230px; display: flex; flex-direction: column; }
+#txcard .tbl { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#txcard .tfoot { margin-top: auto; flex: none; }
+#txcard .tr { flex: none; }
+#txcard .tbl .tr:not(.th) { flex: 1 0 auto; max-height: 66px; }
 #acccard { display: flex; flex-direction: column; }
 .trend.nwchart { flex: 1 1 90px; height: auto; min-height: 90px; max-height: 260px; margin-top: 12px; }
 @media (max-width: 860px) { .span-7, .span-5, .span-8, .span-4, .span-6 { grid-column: span 12; } }
-/* side by side, the calendar sets the row's height and the category list scrolls inside its card
-   (height 0 keeps it out of the row sizing; min-height then fills the row) */
-@media (min-width: 861px) {
-  #catcard { height: 0; min-height: 100%; display: flex; flex-direction: column; }
-  #catcard #cats { flex: 1; min-height: 0; overflow-y: auto; margin-right: -8px; padding-right: 8px; }
-}
+#cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px 16px; align-items: start; }
+#cats .bud-sum, #cats .empty { grid-column: 1 / -1; }
 .card h2 { font-size: 16px; font-weight: 400; color: var(--ink); margin: 0 0 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .card h2 .right { margin-left: auto; font-weight: 400; }
 .ghost { background: none; border: 0; border-radius: 7px; padding: 6px 10px; color: var(--ink-2); }
@@ -155,7 +158,7 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .seg2 button { border: 0; background: none; color: var(--muted); height: 26px; padding: 0 10px; border-radius: 6px; font-size: 13px; }
 .seg2 button.on { background: var(--surface-2); color: var(--ink); }
 .chart { position: relative; touch-action: pan-y; }
-.chart svg { display: block; width: 100%; height: 100%; }
+.chart svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .chart text { fill: var(--ink-3); font-size: 12.5px; font-family: var(--font); }
 .ctip { position: absolute; z-index: 3; min-width: 170px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--tooltip); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: 12.5px; pointer-events: none; }
 .ctip .t { color: var(--ink-2); text-transform: uppercase; font-size: 12px; margin-bottom: 4px; white-space: nowrap; }
@@ -215,10 +218,14 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .up { color: var(--bad); } .down { color: var(--good); }
 
 /* calendar */
-.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+#v-analytics .grid { flex: 1 1 0; min-height: 430px; grid-template-rows: minmax(0, 1fr); }
+#calcard, #merchcard { display: flex; flex-direction: column; min-height: 0; }
+#cal { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#merch { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: none; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; flex: 1; min-height: 0; grid-template-rows: auto; grid-auto-rows: minmax(46px, 1fr); }
 @media (max-width: 520px) { .cal { gap: 4px; } .cal .day { padding: 4px 5px; min-height: 0; height: 46px; aspect-ratio: auto; border-radius: 7px; } .cal .day .amt { font-size: 10.5px; } .legend span { display: none; } }
 .cal .dow { font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
-.day { aspect-ratio: 1 / .82; min-width: 0; overflow: hidden; border-radius: 9px; background: var(--heat-0); border: 0; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; position: relative; min-height: 46px; }
+.day { min-width: 0; overflow: hidden; border-radius: 9px; background: var(--heat-0); border: 0; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; position: relative; min-height: 46px; }
 .day .n { font-size: 11px; color: var(--muted); }
 .day .amt { font-size: 12px; font-weight: 600; }
 .day.l3 .n, .day.l4 .n, .day.l5 .n { color: rgba(255,255,255,.75); }
@@ -402,23 +409,65 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--page); padding: 9px 14px; border-radius: 10px; z-index: 60; font-size: 13px; }
 .skeleton { color: var(--muted); padding: 40px 0; text-align: center; }
 
-/* narrower windows: the cards panel and sidebar give way before the table does */
-@media (max-width: 1240px) { .over { grid-template-columns: minmax(0, 1fr); } .panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--gap); } .panel hr { display: none; } .panel-h { grid-column: 1 / -1; } .kpi-v { font-size: 24px; } }
-@media (max-width: 1240px) { .tr { grid-template-columns: 36px minmax(0, 1.7fr) minmax(0, 1fr) 96px 84px 84px 36px; } .c-id { display: none; } }
+/* short windows: everything tightens so the Dashboard tab still fits without scrolling */
+@media (max-height: 1120px) and (min-width: 901px) {
+  .side { padding-top: 20px; }
+  .brand { margin-bottom: 16px; }
+  .nav-label { margin-top: 16px; }
+  .side nav { gap: 4px; }
+  .promo p { display: none; }
+  .promo b { margin-bottom: 8px; }
+  .view { gap: 12px; padding: 12px 20px 16px; }
+  .top { padding-top: 14px; }
+  .alert { min-height: 34px; padding: 3px 12px; font-size: 13.5px; }
+  .over, .over-l { gap: 12px; }
+  .kpi-top { padding: 10px 14px 8px; }
+  .kpi-v { font-size: 22px; margin-top: 8px; }
+  .kpi-f { min-height: 32px; padding: 3px 14px; }
+  .badge { height: 20px; }
+  .card { padding: 12px 14px; }
+  .bankcard { aspect-ratio: auto; min-height: 0; height: 132px; padding: 10px 14px; }
+  .bankcard .chip-row { left: 14px; top: 10px; transform: scale(.8); transform-origin: 0 0; }
+  .bankcard .digits { top: 44px; font-size: 16px; left: 14px; }
+  .bankcard .foot { bottom: 10px; left: 14px; right: 14px; }
+  .bankcard b { font-size: 13.5px; }
+  .panel-h { margin-bottom: 8px; }
+  .panel hr { margin: 6px 0; }
+  .spent { margin: 4px 0 6px; }
+  .spent .v { font-size: 22px; }
+  .ticks { height: 26px; }
+  .limit { margin-top: 8px; padding: 4px 10px; font-size: 13px; }
+  .tx-h { margin-bottom: 8px; }
+  .view > #txcard { min-height: 200px; }
+  .tr { min-height: 44px; }
+  .tr.th { min-height: 30px; font-size: 13px; }
+  .tfoot { min-height: 40px; padding: 3px 12px; font-size: 13px; }
+  .pager button { width: 28px; height: 28px; }
+}
+@media (max-height: 700px) and (min-width: 901px) { .promo { display: none; } .tr .m small { display: none; } }
+@media (max-width: 1240px) { .over { grid-template-columns: minmax(0, 1fr) minmax(280px, 34%); } .kpi-v { font-size: 21px; } .kpi-h { font-size: 13px; } .tile { display: none; } .tr { grid-template-columns: 36px minmax(0, 1.7fr) minmax(0, 1fr) 96px 84px 84px 36px; } .c-id { display: none; } }
 @media (max-width: 1000px) { .tr { grid-template-columns: 36px minmax(0, 1.7fr) minmax(0, 1fr) 84px 84px 36px; } .c-date { display: none; } }
+@media (max-width: 1000px) { .over { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 900px) {
-  .wrap { padding: 0; }
-  body::before, body::after { display: none; }
-  .app { grid-template-columns: minmax(0, 1fr); background: var(--frame); }
-  .side { position: static; height: auto; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px 16px 8px; overflow: visible; }
-  .brand { margin-bottom: 12px; }
+  /* phones: brand and month on one line, tabs in one sideways strip, the tab's content scrolls below */
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .side { height: auto; overflow: visible; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: center; padding: 10px 16px 6px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand { margin: 0; font-size: 17px; }
+  .who { min-height: 40px; padding: 3px 8px; grid-template-columns: minmax(0, 1fr) 22px; }
+  .who .ava { display: none; }
+  .who b { font-size: 13px; }
+  .who small { font-size: 11.5px; }
+  .tabs { grid-column: 1 / -1; flex-direction: row; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .tabs nav, .side-end { display: contents; }
   .nav-label, .promo { display: none; }
-  .side nav, .side-end { flex-direction: row; display: flex; gap: 4px; overflow-x: auto; margin-top: 8px; scrollbar-width: none; }
-  .side-end { margin-top: 4px; }
   .nav-item { width: auto; flex: none; padding: 0 10px; height: 34px; font-size: 14px; gap: 8px; }
-  .main { padding: 16px; }
-  .panel { display: flex; }
-  .panel hr { display: block; }
+  .main { min-height: 0; }
+  .top { padding: 12px 16px 0; }
+  .view { padding: 12px 16px 16px; }
+  .view > #txcard { flex: none; }
+  #v-analytics .grid { flex: none; grid-template-rows: none; }
+  #merch { overflow: visible; }
+  .cal { flex: none; }
 }
 @media (max-width: 720px) {
   .top { flex-wrap: wrap; }
@@ -426,6 +475,7 @@ body::after { content: ""; position: fixed; left: 0; top: 0; width: 92px; height
   .topsearch { order: 3; width: 100%; margin-left: 0; }
   .topsearch kbd { display: none; }
   .kpis { grid-template-columns: minmax(0, 1fr); }
+  .kpi-top { padding: 12px 16px 10px; }
   .alert { align-items: flex-start; flex-wrap: wrap; font-size: 13.5px; }
   .alert .msg { flex: 1 1 calc(100% - 28px); }
   .alert a { margin-left: 24px; }
@@ -505,7 +555,7 @@ const S = {
   income: { items: [], count: 0, total: 0 }, accounts: { items: [] }, networth: null,
   hideNW: store.get("spend_hide_nw") === "1",  // per-device: net worth shown as dots
   hideAll: store.get("spend_hide_all") === "1",  // per-device: every amount shown as dots
-  day: null, category: null, q: "", tx: { items: [], count: 0, total: 0 }, offset: 0,
+  day: null, category: null, q: "", tx: { items: [], count: 0, total: 0 }, offset: 0, txPage: 10, view: "dashboard",
 };
 
 // ---------- login ----------
@@ -521,7 +571,7 @@ function renderLogin(err) {
 
 // ---------- shell ----------
 function renderShell() {
-  const nav = NAV.map(([label, target, icon], i) => `<button class="nav-item ${i ? "" : "on"}" data-go="${target}">${ICON[icon]}${label}</button>`).join("");
+  const nav = NAV.map(([label, view, icon]) => `<button class="nav-item" data-view="${view}">${ICON[icon]}${label}</button>`).join("");
   $("#app").innerHTML = `<div class="wrap"><div class="app" id="top">
     <aside class="side">
       <div class="brand"><i class="mark">${ICON.mark}</i><span>Spend</span></div>
@@ -530,43 +580,47 @@ function renderShell() {
         <div><b>Anil</b><small id="mlabel"></small></div>
         <span class="stepper"><button id="next" aria-label="Next month">${ICON.up}</button><button id="prev" aria-label="Previous month">${ICON.down}</button></span>
       </div>
-      <div class="nav-label">MAIN MENU</div>
-      <nav>${nav}</nav>
-      <div class="side-end">
-        <div class="nav-label">SUPPORT</div>
-        <button class="nav-item" id="settings">${ICON.gear}Settings</button>
-        <button class="nav-item" id="hideall"></button>
-        <div class="promo" id="promo"></div>
+      <div class="tabs">
+        <div class="nav-label">MAIN MENU</div>
+        <nav>${nav}</nav>
+        <div class="side-end">
+          <div class="nav-label">SUPPORT</div>
+          <button class="nav-item" id="settings">${ICON.gear}Settings</button>
+          <button class="nav-item" id="hideall"></button>
+          <div class="promo" id="promo"></div>
+        </div>
       </div>
     </aside>
     <main class="main">
       <header class="top">
-        <h1>Dashboard</h1>
+        <h1 id="vtitle">Dashboard</h1>
         <label class="topsearch">${ICON.search}<input id="tq" placeholder="Search" aria-label="Search purchases"><kbd>⌘K</kbd></label>
         <button class="icon-btn" id="bell" aria-label="Purchases to review">${ICON.bell}</button>
         <div class="themesw"><button id="tdark" aria-label="Dark mode">${ICON.moon}</button><button id="tlight" aria-label="Light mode">${ICON.sun}</button></div>
       </header>
-      <div class="alert" id="alert"></div>
-      <div class="over">
-        <div class="over-l">
-          <div class="kpis" id="kpis"><div class="skeleton">Loading…</div></div>
-          <section class="card" id="chartcard"></section>
+      <div class="view" id="v-dashboard">
+        <div class="alert" id="alert"></div>
+        <div class="over">
+          <div class="over-l">
+            <div class="kpis" id="kpis"><div class="skeleton">Loading…</div></div>
+            <section class="card" id="chartcard"></section>
+          </div>
+          <section class="card panel" id="cards"></section>
         </div>
-        <section class="card panel" id="cards"></section>
+        <section class="card" id="txcard"></section>
       </div>
-      <section class="card" id="txcard"></section>
-      <div class="stats" id="hero"></div>
-      <div class="grid">
-        <section class="card span-7" id="calcard"><h2>Daily spend <span class="right note" id="calnote"></span></h2><div id="cal"></div></section>
-        <section class="card span-5" id="catcard"><h2>Categories <span class="right note" id="catnote"></span><button class="ghost" id="budbtn" style="padding:2px 8px">Budgets</button></h2><div id="cats"></div></section>
-        <section class="card span-7" id="acccard"></section>
-        <div class="span-5 stack">
-          <section class="card" id="flowcard"></section>
-          <section class="card grow" id="reccard"><h2>Recurring <button class="ghost right" id="addrec" style="padding:2px 8px">+ Add</button></h2><div id="rec"></div></section>
+      <div class="view" id="v-analytics">
+        <div class="stats" id="hero"></div>
+        <div class="grid">
+          <section class="card span-7" id="calcard"><h2>Daily spend <span class="right note" id="calnote"></span></h2><div id="cal"></div></section>
+          <section class="card span-5" id="merchcard"><h2>Top merchants</h2><div id="merch"></div></section>
         </div>
-        <section class="card span-6" id="merchcard"><h2>Top merchants</h2><div id="merch"></div></section>
-        <section class="card span-6" id="owedcard" hidden></section>
       </div>
+      <div class="view" id="v-transactions"></div>
+      <div class="view" id="v-budgets"><section class="card" id="catcard"><h2>Categories <span class="right note" id="catnote"></span><button class="ghost" id="budbtn" style="padding:2px 8px">Budgets</button></h2><div id="cats"></div></section></div>
+      <div class="view" id="v-accounts"><section class="card" id="acccard"></section></div>
+      <div class="view" id="v-recurring"><section class="card" id="reccard"><h2>Recurring <button class="ghost right" id="addrec" style="padding:2px 8px">+ Add</button></h2><div id="rec"></div></section></div>
+      <div class="view" id="v-income"><div class="two"><section class="card" id="flowcard"></section><section class="card" id="owedcard" hidden></section></div></div>
     </main>
   </div></div>`;
   $("#prev").onclick = () => setMonth(shiftYm(S.month, -1));
@@ -590,17 +644,38 @@ function renderShell() {
   let deb;
   $("#tq").oninput = (e) => { clearTimeout(deb); deb = setTimeout(() => { S.q = e.target.value.trim(); S.offset = 0; loadTx(); }, 250); };
   $("#tq").onkeydown = (e) => { if (e.key === "Enter") goTo("#txcard"); };
-  document.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => goTo(b.dataset.go));
-  const items = [...document.querySelectorAll("[data-go]")];
-  const spy = new IntersectionObserver((seen) => seen.forEach((e) => {
-    if (!e.isIntersecting) return;
-    items.forEach((b) => b.classList.toggle("on", b.dataset.go === `#${e.target.id}`));
-  }), { rootMargin: "-20% 0px -70% 0px" });
-  ["kpis", ...NAV.slice(1).map((n) => n[1].slice(1))].forEach((id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
+  document.querySelectorAll("[data-view]").forEach((b) => b.onclick = () => { location.hash = b.dataset.view; });
+  setView(viewFromHash());
 }
+const viewFromHash = () => { const v = location.hash.slice(1); return NAV.some((n) => n[1] === v) ? v : "dashboard"; };
+function setView(v) {
+  S.view = v;
+  document.querySelectorAll(".view").forEach((el) => el.classList.toggle("on", el.id === `v-${v}`));
+  document.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+  $("#vtitle").textContent = NAV.find((n) => n[1] === v)[0];
+  if (v === "dashboard" || v === "transactions") { $(`#v-${v}`).appendChild($("#txcard")); fitTx(); }
+  $(`#v-${v}`).scrollTop = 0;
+  if (v === "dashboard") renderChart();  // it can't measure itself while hidden
+}
+addEventListener("hashchange", () => { if ($("#vtitle")) setView(viewFromHash()); });
+// the tab that holds a card; opens it, or stays put when it's already showing
 function goTo(sel) {
-  const el = sel === "#kpis" ? $("#top") : $(sel);
-  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const v = { "#txcard": "transactions", "#calcard": "analytics", "#catcard": "budgets", "#acccard": "accounts", "#reccard": "recurring", "#flowcard": "income" }[sel];
+  if (v) location.hash = v;
+}
+// as many rows as the card has room for, so the table ends where the tab does
+function fitTx() {
+  const card = $("#txcard"), tbl = card && $(".tbl", card);
+  if (!tbl || !card.offsetParent) return;
+  let n = 10;
+  if (innerWidth > 900) {
+    const r = $(".tr:not(.th)", tbl), row = r ? parseFloat(getComputedStyle(r).minHeight) : 54;  // rows stretch, so use the smallest they can be
+    const room = tbl.clientHeight - ($(".th", tbl)?.offsetHeight || 0) - ($(".tfoot", tbl)?.offsetHeight || 0);
+    n = Math.max(2, Math.floor((room + 2) / row));
+  }
+  if (n === S.txPage) return;
+  S.offset = Math.floor(S.offset / n) * n;
+  S.txPage = n; loadTx();
 }
 
 // redraw from loaded data (no refetch), e.g. after toggling privacy mode
@@ -660,14 +735,13 @@ async function refreshAll() { S.cats = await api("/categories"); await Promise.a
 async function loadShares() { S.shares = await api("/shares"); renderOwed(); }
 
 let txSeq = 0;
-const TX_PAGE = 10;
 async function loadTx() {
   const seq = ++txSeq;
   const [y, m] = S.month.split("-");
   const last = new Date(+y, +m, 0).getDate();
   const p = new URLSearchParams({
     start: S.day || `${S.month}-01`, end: S.day || `${S.month}-${String(last).padStart(2, "0")}`,
-    limit: TX_PAGE, offset: S.offset,
+    limit: S.txPage, offset: S.offset,
   });
   if (S.category) p.set("category", S.category);
   if (S.q) p.set("q", S.q);
@@ -697,8 +771,8 @@ const ICON = {
   chip: `<svg width="36" height="28" viewBox="0 0 36 28" fill="none"><rect x=".5" y=".5" width="35" height="27" rx="5" fill="#cfcfcf" stroke="#9b9b9b"/><path d="M0 9h11l3 3v5l-3 3H0M36 9H25l-3 3v5l3 3h11M12 0v6M24 0v6M12 28v-6M24 28v-6" stroke="#8c8c8c"/></svg>`,
   wave: svg(`<path d="M7 9a4.5 4.5 0 0 1 0 6M10.5 6.5a8 8 0 0 1 0 11M14 4a12 12 0 0 1 0 16"/>`, 20),
 };
-const NAV = [["Dashboard", "#kpis", "home"], ["Analytics", "#calcard", "bars"], ["Transactions", "#txcard", "list"], ["Budgets", "#catcard", "wallet"],
-  ["Accounts", "#acccard", "bank"], ["Recurring", "#reccard", "repeat"], ["Income", "#flowcard", "income"]];
+const NAV = [["Dashboard", "dashboard", "home"], ["Analytics", "analytics", "bars"], ["Transactions", "transactions", "list"], ["Budgets", "budgets", "wallet"],
+  ["Accounts", "accounts", "bank"], ["Recurring", "recurring", "repeat"], ["Income", "income", "income"]];
 const pctChange = (now, was) => (was ? ((now - was) / Math.abs(was)) * 100 : null);
 const pctText = (p) => `${p >= 0 ? "+" : "−"}${Math.abs(p).toFixed(1)}%`;
 const monthPace = (s) => {
@@ -726,7 +800,7 @@ function renderHero() {
     S.need = S.need === "want" ? null : "want"; S.offset = 0;
     renderHero();
     await loadTx();
-    if (S.need) $("#txcard").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (S.need) goTo("#txcard");
   };
   $("#bell").classList.toggle("dot-on", !!s.review_count);
   $("#bell").title = s.review_count ? `${s.review_count} to review` : "Nothing to review";
@@ -987,7 +1061,7 @@ function chartSeries() {
 }
 function renderChart() {
   const card = $("#chartcard");
-  if (!card || !S.stats || !S.trend) return;
+  if (!card || !S.stats || !S.trend || S.view !== "dashboard") return;
   S.flow ||= "monthly";
   const ms = S.trend.months;
   const yearTotal = ms.reduce((a, m) => a + m.total, 0), yearIncome = ms.reduce((a, m) => a + (m.income || 0), 0);
@@ -1049,7 +1123,7 @@ function renderChart() {
   };
 }
 let chartResize;
-addEventListener("resize", () => { clearTimeout(chartResize); chartResize = setTimeout(renderChart, 120); });
+addEventListener("resize", () => { clearTimeout(chartResize); chartResize = setTimeout(() => { renderChart(); fitTx(); }, 120); });
 
 function renderMerchants() {
   const t = S.stats.top_merchants;
@@ -1172,7 +1246,7 @@ function renderTx() {
       <div class="c-more"><button class="more3" data-edit="${i.id}" aria-label="Edit ${esc(i.merchant)}">•••</button></div>
     </div>`;
   });
-  const page = Math.floor(S.offset / TX_PAGE) + 1, pages = Math.max(1, Math.ceil(t.count / TX_PAGE));
+  const page = Math.floor(S.offset / S.txPage) + 1, pages = Math.max(1, Math.ceil(t.count / S.txPage));
   const picked = [...S.sel.values()];
   $("#txcard").innerHTML = `<div class="tx-h"><h2>${S.day ? fmtDay(S.day, { weekday: "long", month: "long", day: "numeric" }) : "Transaction History"}</h2>
       <div class="tx-tools"><label class="tsearch">${ICON.search}<input id="q" placeholder="Search" aria-label="Search purchases" value="${esc(typing ?? S.q)}"></label><button class="btn dark" id="filter">${ICON.filter}Filter</button></div></div>
@@ -1195,11 +1269,12 @@ function renderTx() {
     if (el.checked) S.sel.set(x.id, x.amount); else S.sel.delete(x.id);
     renderTx();
   });
-  const go = (d) => { S.offset = Math.max(0, S.offset + d * TX_PAGE); loadTx(); };
+  const go = (d) => { S.offset = Math.max(0, S.offset + d * S.txPage); loadTx(); };
   $("#pgprev").onclick = () => go(-1);
   $("#pgnext").onclick = () => go(1);
   $("#filter").onclick = (e) => { e.stopPropagation(); filterPop(e.currentTarget); };
   const rc = $("#revchip"); if (rc) rc.onclick = () => { S.review = !S.review; S.offset = 0; loadTx(); };
+  fitTx();
 }
 function filterPop(anchor) {
   closePop();
