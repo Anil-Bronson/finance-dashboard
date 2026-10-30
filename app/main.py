@@ -25,7 +25,7 @@ from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Re
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 import bankcsv
 
@@ -926,6 +926,21 @@ class TxIn(BaseModel):
     note: str = ""
     source: str = "tap"
     currency: str | None = None  # overrides the currency detected in `amount`
+
+    @model_validator(mode="before")
+    @classmethod
+    def clean_keys(cls, data):
+        # keys typed in the Shortcuts editor can pick up an invisible trailing space ("merchant ")
+        # or a capital; null fields (a tap with no details) become empty strings
+        if not isinstance(data, dict):
+            return data
+        out = {}
+        for k, v in data.items():
+            key = re.sub(r"[^a-z_]", "", str(k).lower())
+            if key != k:
+                log.info("tx field %r read as %r", k, key)
+            out[key] = "" if v is None and key in ("amount", "merchant", "card", "note") else v
+        return out
 
 
 def prepare_money(raw, ts: str, currency: str | None = None) -> dict:

@@ -203,6 +203,11 @@ r = c.post("/tx/batch", headers=H, json={"lines": f"{iso(now)}| ||\n{iso(now)}|$
 assert r["added"] == 1 and r["skipped"] == 1 and r["errors"] == []
 assert c.get("/tx", headers=H).json()["count"] == before + 1
 assert c.post("/tx", headers=H, json={"amount": "abc", "merchant": "X"}).status_code == 422
+# Shortcut keys with a stray space or capital, and null fields, still work
+r = c.post("/tx", headers=H, json={"merchant ": "Momo Sushi", "Amount": "$7.45", "card​": "Visa", "ts": iso(now)}).json()
+assert r["id"] and c.get("/tx", headers=H, params={"q": "Momo"}).json()["items"][0]["amount"] == 7.45
+c.delete(f"/tx/{r['id']}", headers=H)
+assert c.post("/tx", headers=H, json={"merchant": None, "amount": None, "card": None}).json()["skipped"] == "empty amount"
 
 # ---- foreign currency ----
 assert main.parse_money("$12.34") == (1234, "CAD")
