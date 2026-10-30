@@ -22,23 +22,25 @@ cash, anything else ──▶ "+ Add" in the dashboard ─────┘       
 - **Tailscale has to be on.** The site only resolves to the server's Tailscale IP.
 
 ### Privacy
-- **Hide all amounts:** the eye button in the top bar, next to the gear, turns every amount on the dashboard into ••••. Useful for screen sharing or using it in public.
+- **Hide all amounts:** **Hide amounts** in the sidebar turns every amount on the dashboard into ••••. Useful for screen sharing or using it in public.
 - **Hide net worth only:** the eye button on the Accounts card hides balances and net worth, and leaves spending visible.
 - Both are remembered per device, so hiding on the Mac doesn't hide on the phone.
 
 ### Dashboard
-- **Top summary:** spent so far against your budget, with a pace marker, the daily average, a projected month-end, and a comparison with last month. **Optional (wants)** shows how much of the month was optional; tap it to list every optional purchase.
-- **Daily spend calendar:** each day is shaded by spend (darker purple = more). Tap a day to see its purchases.
+- **Top of the page:** net worth, income and expenses against last month, plus an alert line for the worst budget or the biggest jump.
+- **My Cards and Spending:** your cards and their balances (tap to see the next one), then spent so far against your budget, with the outlined bar marking an even pace.
+- **Month stats:** the daily average, a projected month-end, and a comparison with last month. **Optional (wants)** shows how much of the month was optional; tap it to list every optional purchase.
+- **Daily spend calendar:** each day is shaded by spend (brighter teal = more on the dark theme, darker teal on the light one). Tap a day to see its purchases.
 - **Categories:** this month vs last, with budget markers. Tap one to filter the list.
 - **Cash flow:** income, spending, net and savings rate for the month, plus the month's income entries. Use "+ Income" to log one.
-- **Accounts · net worth:** balances, assets minus what you owe, and a chart of net worth by month.
+- **Accounts:** balances, assets minus what you owe, and a chart of net worth by month.
 - **Transactions:**
-  - Search, edit, or delete. A negative amount is a refund.
+  - Search, filter, edit, or delete, 10 to a page. A negative amount is a refund. Tick rows to add them up.
   - Tap a category pill to change it, or to confirm an **AI?** pick.
   - "N to review" filters to the AI's unsure picks.
-- **Year chart:** Jan–Dec spending bars, with a green line for each month's income. Tap a bar to open that month.
+- **Cash Flow Overview:** income and spending lines, Monthly (Jan–Dec), Weekly or Daily. Tap a month to open it, or a day to see its purchases.
 - **Top merchants and Recurring:** your repeating payments and income, plus **"Looks like a subscription"** suggestions.
-- **Settings (gear):** budget, category names/colors/budgets, light or dark mode.
+- **Settings:** category names and colors, and the default income account. The moon/sun switch in the header picks dark (the default) or light.
 - `?month=2026-09` in the URL opens a specific month.
 
 ### How money gets in
