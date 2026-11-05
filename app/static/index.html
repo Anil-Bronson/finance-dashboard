@@ -175,7 +175,7 @@ html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 .wallet:has(> :only-child) { grid-template-columns: minmax(0, 240px); }
 .wcard { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 0; background: none; border: 0; color: var(--ink); text-align: left; }
 .wcard img { display: block; width: 100%; height: auto; border-radius: 9px; filter: drop-shadow(0 3px 8px rgba(0,0,0,.35)); transition: transform .15s; }
-.wcard:hover img { transform: translateY(-2px); }
+button.wcard:hover img { transform: translateY(-2px); }
 .wcap { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-width: 0; }
 .wcap b { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wcap small { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
@@ -1249,9 +1249,14 @@ function renderCards() {
   if (!s || !A?.items) return;
   const hm = (n) => (S.hideNW ? "••••••" : money(n));
   const list = A.items.filter((a) => a.active && artFor(a)).sort((x, y) => (artFor(x) === "td" ? -1 : 1) - (artFor(y) === "td" ? -1 : 1));
-  const face = list.length ? `<div class="wallet">${list.map((a) => `<button class="wcard" data-bal="${a.id}" title="Update ${esc(a.name)} balance">
-      <img src="${CARD_ART[artFor(a)]}" alt="${esc(a.name)}" width="480" height="302">
-      <span class="wcap"><b class="num">${a.balance === null ? "Set balance" : (a.liability && a.balance ? "−" : "") + hm(a.balance)}</b><small>${a.as_of ? fmtDay(a.as_of, { month: "short", day: "numeric" }) : ""}</small></span></button>`).join("")}</div>`
+  // a debit card never owes anything, and its account's real balance belongs to the Accounts tab
+  const cardTile = (a) => {
+    const img = `<img src="${CARD_ART[artFor(a)]}" alt="${esc(a.name)} card" width="480" height="302">`;
+    if (!a.liability) return `<div class="wcard debit">${img}<span class="wcap"><b class="num">${hm(0)}</b><small>Debit</small></span></div>`;
+    return `<button class="wcard" data-bal="${a.id}" title="Update ${esc(a.name)} balance">${img}
+      <span class="wcap"><b class="num">${a.balance === null ? "Set balance" : (a.balance ? "−" : "") + hm(a.balance)}</b><small>${a.as_of ? fmtDay(a.as_of, { month: "short", day: "numeric" }) : ""}</small></span></button>`;
+  };
+  const face = list.length ? `<div class="wallet">${list.map(cardTile).join("")}</div>`
     : `<div class="note">No cards yet</div>`;
   const b = s.budget, pct = b ? (s.total / b) * 100 : 0, N = 30;
   const on = b ? Math.round((pct100(pct) / 100) * N) : 0;
