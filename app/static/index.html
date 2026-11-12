@@ -499,6 +499,7 @@ function renderHero() {
     <div>
       <div class="note">${s.is_current ? "Spent so far" : "Spent"} · ${s.count} purchases</div>
       <div class="big num">${money(s.total)}</div>
+      ${s.fx_pending_count ? `<div class="sub" style="color:var(--warn)">${s.fx_pending_count} foreign purchase${s.fx_pending_count === 1 ? "" : "s"} not converted yet, counted as $0 for now</div>` : ""}
       ${b ? `<div class="meter" title="Budget ${money(b, true)}"><div style="width:${pct}%;background:${tone}"></div>${s.is_current ? `<div class="pace" style="left:${pacePct}%" title="Where you'd be at an even pace"></div>` : ""}</div>
       <div class="sub num">${Math.round((s.total / b) * 100)}% of ${money(b, true)} budget${s.is_current ? ` · ${money(Math.max(0, b - s.total), true)} left` : ""}</div>`
       : `<div class="sub">No monthly budget set · <a href="#" id="setb" style="color:inherit">set one</a></div>`}
@@ -1118,7 +1119,7 @@ async function importPreview(req, fname) {
     const sub = r.match
       ? `${r.match.kind === "income" ? "Logged income" : "Logged"}: ${esc(r.match.name)}, ${fmtDay(r.match.ts.slice(0, 10))}${r.fix !== null ? ` · amount → ${money(r.fix)} (was ${money(r.match.amount)})` : ""}`
       : esc(r.reason);
-    return `<div class="imp ${r.ai_unsure ? "unsure" : ""}" ${r.ai_unsure ? `title="The AI wasn't sure. Check this one"` : ""}><span class="note num">${fmtDay(r.date, { month: "short", day: "numeric" })}</span>
+    return `<div class="imp ${r.ai_unsure || r.check ? "unsure" : ""}" ${r.check ? `title="Same amount, but the names don't match. Check it's the same purchase"` : r.ai_unsure ? `title="The AI wasn't sure. Check this one"` : ""}><span class="note num">${fmtDay(r.date, { month: "short", day: "numeric" })}</span>
       <div class="m"><b>${esc(r.description)}</b>${sub ? `<small>${sub}</small>` : ""}</div>
       <span class="num ${r.money_in ? "pos" : ""}">${r.money_in ? "+" : ""}${money(Math.abs(r.amount))}</span>
       ${r.action === "seen" ? `<span class="note">${esc(r.reason)}</span>` : select(r)}</div>`;
@@ -1127,7 +1128,8 @@ async function importPreview(req, fname) {
     ["New", pv.rows.filter((r) => r.action === "purchase" || r.action === "income"), true],
     ["Paid back", pv.rows.filter((r) => r.action === "payback"), true],
     ["Skipped", pv.rows.filter((r) => r.action === "skip"), true],
-    ["Already logged", pv.rows.filter((r) => r.action === "matched"), false],
+    ["Check these matches (same amount, different name)", pv.rows.filter((r) => r.action === "matched" && r.check), true],
+    ["Already logged", pv.rows.filter((r) => r.action === "matched" && !r.check), false],
     ["Imported before", pv.rows.filter((r) => r.action === "seen"), false],
   ].filter((g) => g[1].length);
   const n = pv.counts;

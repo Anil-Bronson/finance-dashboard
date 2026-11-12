@@ -235,7 +235,12 @@ def parse_statement(text: str, flip: bool = False, date_order: str = "auto") -> 
 # ---- what a row probably is ----
 
 CARD_PAYMENT_RECEIVED = ["payment", "pymt", "paiement", "thank you", "merci", "autopay"]
-CARD_WORDS = ["visa", "mastercard", "master card", "amex", "american express", "credit card"]
+CARD_WORDS = ["visa", "mastercard", "master card", "mc", "m/c", "amex", "american express", "credit card"]
+# Card issuers whose payments often don't name the network ("ROGERS BANK PAYMENT", "MBNA PAYMENT")
+CARD_ISSUERS = ["rogers bank", "mbna", "capital one", "pc financial", "pc mastercard", "president's choice financial",
+                "canadian tire bank", "triangle", "neo financial", "brim financial", "home trust", "walmart rewards",
+                "desjardins card", "td credit card", "cibc credit card", "bmo credit card", "scotia credit card",
+                "rbc credit card"]
 PAY_WORDS = ["payment", "pymt", "pmt", "paiement", "bill pay", "preauth", "autopay"]
 TRANSFER = ["transfer", "tfr", "xfer", "to savings", "from savings", "tfsa", "rrsp", "fhsa", "resp",
             "contribution", "internal", "between accounts"]
@@ -250,10 +255,14 @@ def has(desc: str, words: list[str]) -> bool:
     return any(re.search(rf"(?<![a-z0-9]){re.escape(w)}s?(?![a-z0-9])", d) for w in words)
 
 
-def is_card_payment(desc: str) -> bool:
-    """Money out of chequing toward a credit card: a card word *and* a payment word, so
-    "VISA DEBIT PURCHASE SAFEWAY" stays a purchase."""
-    return has(desc, ["card payment", "card pymt"]) or (has(desc, CARD_WORDS) and has(desc, PAY_WORDS))
+def is_card_payment(desc: str, own_cards: list[str] | None = None) -> bool:
+    """Money out of chequing toward a credit card: a payment word *and* something that says
+    card (the network, a card issuer, or the name of one of your own credit card accounts),
+    so "VISA DEBIT PURCHASE SAFEWAY" stays a purchase."""
+    if has(desc, ["card payment", "card pymt"]):
+        return True
+    cards = [n.strip().lower() for n in own_cards or [] if len(n.strip()) > 2]
+    return has(desc, PAY_WORDS) and (has(desc, CARD_WORDS) or has(desc, CARD_ISSUERS) or has(desc, cards))
 
 
 def transfer_person(desc: str) -> str:
