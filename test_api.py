@@ -797,8 +797,11 @@ assert any(l.startswith("October: ") for l in mid["lines"]), mid["lines"]
 # shows up: an open IOU and next week's recurring charges
 iou_tx = add("Weekly IOU Test", 80, end - timedelta(days=1), "Dining")
 c.post(f"/tx/{iou_tx}/shares", headers=H, json={"person": "Robin", "amount": 40})
+# first charge inside next week but still in the future: one due today or earlier is logged right
+# away, and then it's no longer upcoming (end + 3 is already past from Wednesday on)
 c.post("/recurring", headers=H, json={"name": "Weekly Test Gym", "amount": 20, "freq": "weekly",
-                                      "anchor": (end + timedelta(days=3)).isoformat(), "category": "Health & Fitness"})
+                                      "anchor": max(end + timedelta(days=3), t + timedelta(days=1)).isoformat(),
+                                      "category": "Health & Fitness"})
 wk = c.get("/summary/weekly", headers=H, params={"end": end.isoformat()}).json()
 assert any("Owed to you" in l and "Robin" in l for l in wk["lines"]), wk["lines"]
 assert any(l.startswith("Next week:") and "Weekly Test Gym $20" in l for l in wk["lines"]), wk["lines"]
