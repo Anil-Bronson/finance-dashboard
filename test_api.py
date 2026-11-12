@@ -241,7 +241,7 @@ assert fx["amount"] == round(10 * 1.40 * (1 + main.FX_FEE_PCT / 100), 2), fx
 assert fx["orig_currency"] == "USD" and fx["fx_rate"] == 1.40 and not fx["fx_pending"]
 
 # rate source down: stored as pending (amount 0), worker converts it later
-main._fx_down_until = 0
+main._fx_down_until.clear()
 def down(*a, **k): raise RuntimeError("offline")
 line = f"{iso(day)}|€8,50|Amex|Café Paris"
 with mock.patch.object(main.httpx, "get", down):
@@ -251,7 +251,7 @@ paris = c.get("/tx", headers=H, params={"q": "Paris"}).json()["items"][0]
 assert paris["fx_pending"] and paris["amount"] == 0 and paris["orig_amount"] == 8.5
 with mock.patch.object(main.httpx, "get", down):  # breaker: no network wait for a minute
     assert main.convert_pending() == 0
-main._fx_down_until = 0
+main._fx_down_until.clear()
 with mock.patch.object(main.httpx, "get", fake_get):
     assert main.convert_pending() == 1
     # the phone re-sends the same queue line: still one purchase
@@ -393,7 +393,7 @@ def mdy(d): return d.strftime("%m/%d/%Y")
 # a tap and a converted US$ purchase the statement should recognise
 tap_day = t - timedelta(days=3)
 c.post("/tx", headers=H, json={"amount": "6.45", "merchant": "Starbucks", "card": "Visa", "ts": iso(datetime.combine(tap_day, datetime.min.time(), TZ).replace(hour=8))})
-main._fx_down_until = 0
+main._fx_down_until.clear()
 with mock.patch.object(main.httpx, "get", fake_get):
     c.post("/tx", headers=H, json={"amount": "US$20.00", "merchant": "Hotel NYC", "card": "Visa", "ts": iso(datetime.combine(tap_day, datetime.min.time(), TZ).replace(hour=20))})
 hotel = c.get("/tx", headers=H, params={"q": "Hotel NYC"}).json()["items"][0]
@@ -858,5 +858,72 @@ same = "date,description,amount\n2026-09-02,TWIN CAFE,7.25\n2026-09-03,OTHER THI
 for acc in (ca, cb):
     assert c.post("/import/commit", headers=H, json={"account_id": acc, "csv": same}).json()["purchase"] == 2
 assert c.get("/tx", headers=H, params={"q": "Twin Cafe", "start": "2026-09-01", "end": "2026-09-30"}).json()["count"] == 2
+
+# ---- audit fixes ----
+# F-05: a currency the rate sources don't carry can't hold up the others, and the month says
+# how many purchases are still counted as $0
+main._fx_down_until.clear()
+def only_usd(url, params=None, **kw):
+    if params and params.get("from") == "USD":
+        return FakeRate(1.40)
+    raise RuntimeError("no such currency")
+fx_day = iso(now.replace(hour=11, minute=7))
+with mock.patch.object(main.httpx, "get", down):
+    c.post("/tx", headers=H, json={"amount": "50.00 XXQ", "merchant": "Odd Bazaar", "ts": fx_day})
+    main._fx_down_until.clear()
+    c.post("/tx", headers=H, json={"amount": "US$3.00", "merchant": "Late Diner", "ts": fx_day})
+assert c.get("/stats/month", headers=H).json()["fx_pending_count"] >= 2
+main._fx_down_until.clear()
+with mock.patch.object(main.httpx, "get", only_usd):
+    main.convert_pending()
+late = c.get("/tx", headers=H, params={"q": "Late Diner"}).json()["items"][0]
+odd = c.get("/tx", headers=H, params={"q": "Odd Bazaar"}).json()["items"][0]
+assert not late["fx_pending"] and late["amount"] > 0, late   # converted although XXQ failed first
+assert odd["fx_pending"] and odd["amount"] == 0
+for i in (late, odd):
+    c.delete(f"/tx/{i['id']}", headers=H)
+
+# F-06: a trusted device's browser can't be used by another site; the token and plain clients still work
+with mock.patch.object(main, "TRUSTED_DEVICES", {"100.64.0.10"}):
+    mac = {"X-Forwarded-For": "100.64.0.10"}
+    assert c.post("/subscriptions/nope/dismiss", headers={**mac, "Sec-Fetch-Site": "cross-site"}).status_code == 403
+    assert c.post("/tx", headers={**mac, "Sec-Fetch-Site": "same-site"}, json={"amount": "1", "merchant": "Evil"}).status_code == 403
+    assert c.post("/tx", headers={**mac, "Origin": "https://evil.example"}, json={"amount": "1", "merchant": "Evil"}).status_code == 403
+    assert c.get("/tx", headers=H, params={"q": "Evil"}).json()["count"] == 0
+    assert c.get("/summary", headers={**mac, "Sec-Fetch-Site": "same-origin"}).status_code == 200   # the dashboard itself
+    assert c.get("/summary", headers={**mac, "Sec-Fetch-Site": "none"}).status_code == 200          # typed into the address bar
+    assert c.get("/summary", headers={**mac, "Origin": "http://testserver"}).status_code == 200     # same origin, older browser
+    assert c.get("/summary", headers=mac).status_code == 200                                         # curl, Shortcut, widgets
+    assert c.get("/summary", headers={**H, "Sec-Fetch-Site": "cross-site"}).status_code == 200      # a token is its own proof
+
+# F-02: card payments that don't name the network, and payments to your own cards
+for d in ("ROGERS BANK PAYMENT", "MBNA PAYMENT", "CAPITAL ONE PAYMENT", "PC FINANCIAL MC PYMT", "TD VISA PREAUTH PYMT"):
+    assert bankcsv.is_card_payment(d), d
+for d in ("VISA DEBIT PURCHASE SAFEWAY", "ROGERS WIRELESS PAYMENT", "BILL PAYMENT SHAW CABLE", "MCDONALD'S #4421"):
+    assert not bankcsv.is_card_payment(d), d
+assert bankcsv.is_card_payment("PAYMENT - COSTCO CARD 4421", ["Costco Card"])
+assert not bankcsv.is_card_payment("PAYMENT - COSTCO WHOLESALE", ["Costco Card"])
+
+# F-01: same amount and dates but no shared word is still matched, and flagged to check
+fa = c.post("/accounts", headers=H, json={"name": "Audit Chequing", "type": "chequing"}).json()["id"]
+c.post("/accounts", headers=H, json={"name": "Audit Plus Card", "type": "credit"})
+d1 = t - timedelta(days=40)
+at = lambda h: iso(datetime.combine(d1, datetime.min.time(), TZ).replace(hour=h))
+c.post("/tx", headers=H, json={"amount": "20.13", "merchant": "Subway", "ts": at(12)})
+c.post("/tx", headers=H, json={"amount": "7.77", "merchant": "Matchstick Coffee", "ts": at(9)})
+audit_csv = "\n".join([
+    "Date,Description,Amount",
+    f"{d1 + timedelta(days=1)},SHELL C01234 VANCOUVER,-20.13",
+    f"{d1 + timedelta(days=1)},MATCHSTICK FRASER ST,-7.77",
+    f"{d1 + timedelta(days=2)},PAYMENT TO AUDIT PLUS CARD,-300.00",
+    f"{d1 + timedelta(days=2)},CORNER GROCER,-11.37",
+])
+with mock.patch.object(main, "OPENAI_API_KEY", ""):
+    rows = {r["description"]: r for r in c.post("/import/preview", headers=H, json={"account_id": fa, "csv": audit_csv}).json()["rows"]}
+shell, match = rows["Shell C01234 Vancouver"], rows["Matchstick Fraser St"]
+assert shell["action"] == "matched" and shell["match"]["name"] == "Subway" and shell["check"] is True, shell
+assert match["action"] == "matched" and match["check"] is False, match
+assert rows["Payment To Audit Plus Card"]["action"] == "skip", rows["Payment To Audit Plus Card"]
+assert rows["Corner Grocer"]["action"] == "purchase" and rows["Corner Grocer"]["check"] is False
 
 print("all tests passed")

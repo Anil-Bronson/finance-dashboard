@@ -54,8 +54,8 @@ The app fills the window. Each sidebar item is its own tab (Dashboard, Analytics
 | **+ Add** | Cash, or anything else. The **Purchase / Income** switch is at the top of the form. |
 
 ### Statement import (the preview)
-- **Already logged:** Apple Pay taps, recurring entries and older history are matched, so nothing is counted twice. Foreign-currency taps take the statement's exact CAD amount, and a paycheque whose amount changed takes the real figure.
-- **Skipped:** credit card payments and transfers between your own accounts (TFSA, savings…). Each card's purchases come from that card's own CSV. Interac e-Transfers count: *to* someone is spending, *from* someone usually means they're paying you back.
+- **Already logged:** Apple Pay taps, recurring entries and older history are matched, so nothing is counted twice. Foreign-currency taps take the statement's exact CAD amount, and a paycheque whose amount changed takes the real figure. A match on amount and date alone, where the names share no word, is listed separately under **Check these matches**: it may be a different purchase that cost the same.
+- **Skipped:** credit card payments (by card network, by issuer such as Rogers Bank or MBNA, or by the name of one of your credit card accounts) and transfers between your own accounts (TFSA, savings…). Each card's purchases come from that card's own CSV. Interac e-Transfers count: *to* someone is spending, *from* someone usually means they're paying you back.
 - **AI second opinion:** the AI re-checks the rows keywords are bad at (transfer vs spending, income vs paid back, card payment vs refund) and confirms matches whose names don't share a word. Rows it's unsure about are outlined in amber.
 - **Re-imports are safe:** rows seen before are ignored, so overlapping date ranges are fine, and every choice you made is remembered.
 - **Balances:** a chequing or savings statement's closing balance becomes the account balance, unless you've entered a newer one.
@@ -91,7 +91,7 @@ The app fills the window. Each sidebar item is its own tab (Dashboard, Analytics
 ### Foreign currency
 - **Conversion:** `US$12.00`, `€8,50`, `£3.20`, `¥1,200` and `12.00 USD` are converted to CAD at that day's rate (ECB via Frankfurter, with the Bank of Canada as fallback), plus `FX_FEE_PCT`. A plain `$` means CAD.
 - **Display:** totals are in CAD, and the list also shows what was charged.
-- **Offline:** if no rate can be fetched, the purchase shows "converting…" and is filled in within 5 minutes.
+- **Offline:** if no rate can be fetched, the purchase shows "converting…" and is filled in within 5 minutes. Until then it counts as $0, and the month's total says how many are waiting. A currency neither rate source carries stays that way: edit the purchase and type the CAD amount.
 - **Exact statement amounts:** type the CAD figure over it to match your statement, or import the statement.
 
 ---
@@ -154,6 +154,7 @@ docker compose up -d
 ### Security
 - **Tailnet only:** the DNS record points at the Tailscale IP. The tailnet includes other people's devices, so they're **not** trusted; only `TRUSTED_DEVICES` skip the token.
 - **Caddy is the only way in:** the container listens on `127.0.0.1` only, and trusted devices are identified by the address Caddy reports. A forged header is rejected (tested).
+- **No cross-site requests:** a trusted device needs no token, so a request its browser makes on behalf of another website (`Sec-Fetch-Site`, or a foreign `Origin`) is refused with 403. The token, the dashboard itself, the Shortcut and the widgets are unaffected.
 - **Secrets** (token, OpenAI key) live only in `.env`.
 
 ### AI cost

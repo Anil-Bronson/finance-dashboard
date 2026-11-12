@@ -18,6 +18,7 @@ import time
 from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -439,7 +440,9 @@ def today() -> date:
 
 # ---------- currency conversion ----------
 
-_fx_down_until = 0.0  # after a failed fetch, requests skip the network for a minute
+# After a failed fetch, that currency skips the network for a minute. Per currency, so one
+# the rate sources don't carry can't hold up the others.
+_fx_down_until: dict[str, float] = {}
 
 
 def fetch_rate(cur: str, day: str) -> tuple[float, str] | None:
@@ -467,17 +470,16 @@ def fetch_rate(cur: str, day: str) -> tuple[float, str] | None:
 
 
 def fx_rate(cur: str, day: str) -> float | None:
-    global _fx_down_until
     day = min(day, today().isoformat())
     with db() as c:
         r = c.execute("SELECT rate FROM fx_rates WHERE day=? AND currency=?", (day, cur)).fetchone()
     if r:
         return r["rate"]
-    if time.time() < _fx_down_until:
+    if time.time() < _fx_down_until.get(cur, 0):
         return None
     got = fetch_rate(cur, day)
     if not got:
-        _fx_down_until = time.time() + 60
+        _fx_down_until[cur] = time.time() + 60
         return None
     with db() as c:
         c.execute("INSERT OR REPLACE INTO fx_rates(day, currency, rate, source) VALUES (?,?,?,?)",
@@ -849,11 +851,27 @@ def is_trusted(request: Request) -> bool:
     return client_ip(request) in TRUSTED_DEVICES
 
 
+def cross_site(request: Request) -> bool:
+    """A browser request started by another site (a page you happened to open, posting here).
+    Browsers say so in Sec-Fetch-Site; older ones at least send Origin on cross-site writes.
+    curl, the Shortcut and the widgets send neither."""
+    site = request.headers.get("sec-fetch-site", "")
+    if site:
+        return site not in ("same-origin", "none")
+    origin = request.headers.get("origin", "")
+    return bool(origin) and urlsplit(origin).netloc != request.headers.get("host", "")
+
+
 def auth(request: Request, authorization: str = Header(default="")):
     if not API_TOKEN:
         raise HTTPException(500, "API_TOKEN not set on server")
-    if authorization != f"Bearer {API_TOKEN}" and not is_trusted(request):
+    if hmac.compare_digest(authorization.encode(), f"Bearer {API_TOKEN}".encode()):
+        return
+    if not is_trusted(request):
         raise HTTPException(401, "bad token")
+    # A trusted device needs no token, so its browser must not be usable by other sites
+    if cross_site(request):
+        raise HTTPException(403, "cross-site request")
 
 
 A = [Depends(auth)]
@@ -2044,7 +2062,9 @@ def ai_review_statement(c, acc, items: list[dict], rows: dict) -> None:
             p = float(a["same"].get("probability") or 0)
             if p < 0.5:  # a coincidence of amount and date: keep it as a new purchase
                 it.update(action="purchase", reason=f"AI: not the logged “{it['match']['name']}” ({round(p * 100)}% same)",
-                          match=None, fix=None, ai_unsure=p > 0.25)
+                          match=None, fix=None, ai_unsure=p > 0.25, check=False)
+            elif p >= AI_REVIEW_BELOW:  # the AI is confident it's the same place under another name
+                it["check"] = False
             continue
         choice, conf = a["kind"]["choice"], float(a["kind"].get("confidence") or 0)
         action, label = ROW_ACTION[choice]
@@ -2082,6 +2102,7 @@ def payback_options(r: bankcsv.Row, recent: list) -> list[dict]:
 
 def classify_statement(c, acc, st: bankcsv.Statement, use_ai: bool = False) -> list[dict]:
     liability = ACCOUNT_TYPES[acc["type"]]
+    own_cards = [r["name"] for r in c.execute("SELECT name FROM accounts WHERE type='credit' AND id != ?", (acc["id"],))]
     seen = {r["fingerprint"]: r["action"] for r in
             c.execute("SELECT fingerprint, action FROM bank_rows WHERE account_id=?", (acc["id"],))}
     days = sorted(r.day for r in st.rows)
@@ -2104,7 +2125,7 @@ def classify_statement(c, acc, st: bankcsv.Statement, use_ai: bool = False) -> l
     for r in sorted(st.rows, key=lambda r: (r.day, r.i)):  # earlier rows claim earlier taps
         fp = bank_fingerprint(acc["id"], r)
         it = {"i": r.i, "date": r.day, "description": r.description, "amount": r.amount_cents / 100,
-              "money_in": r.amount_cents < 0, "match": None, "fix": None, "reason": ""}
+              "money_in": r.amount_cents < 0, "match": None, "fix": None, "reason": "", "check": False}
         if fp in seen:
             it.update(action="seen", reason=f"imported before ({seen[fp]})")
             out.append(it)
@@ -2116,7 +2137,7 @@ def classify_statement(c, acc, st: bankcsv.Statement, use_ai: bool = False) -> l
             else:
                 action, reason = "purchase", "" if r.amount_cents > 0 else "refund"
         elif r.amount_cents > 0:
-            if bankcsv.is_card_payment(desc):
+            if bankcsv.is_card_payment(desc, own_cards):
                 action, reason = "skip", "credit card payment (its purchases come from the card)"
             elif bankcsv.is_own_transfer(desc):
                 action, reason = "skip", "transfer between your accounts"
@@ -2136,6 +2157,9 @@ def classify_statement(c, acc, st: bankcsv.Statement, use_ai: bool = False) -> l
                                "amount": m["amount_cents"] / 100}
                 if m["amount_cents"] != r.amount_cents:
                     it["fix"] = r.amount_cents / 100
+                # Same amount and dates, but no word in common: it may be another purchase that
+                # happens to cost the same. Still matched by default; the dashboard asks you to check.
+                it["check"] = not (_words(m["merchant"]) & _words(desc))
         elif action == "income" and bankcsv.E_TRANSFER.search(desc):
             iou = match_iou(r, ious, used_iou)
             if iou:
@@ -2501,6 +2525,8 @@ def stats_month(month: str | None = None):
         "categories": cat_list,
         "top_merchants": sorted(merchants.values(), key=lambda m: m["total"], reverse=True)[:8],
         "review_count": sum(1 for r in rows if needs_review(r)),
+        # foreign purchases still waiting for a rate: they count as $0 until converted
+        "fx_pending_count": sum(1 for r in rows if r["fx_pending"]),
         # needs vs wants (refunds net out); unrated = merchant and category both undecided
         "essential": round(sum(r["amount_cents"] for r in rows if r["need"] == 1) / 100, 2),
         "optional": round(sum(r["amount_cents"] for r in rows if r["need"] == 0) / 100, 2),
