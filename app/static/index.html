@@ -810,6 +810,7 @@ button.rb:hover { background: var(--raised); }
   .top h1 { flex: 1; }
   .topsearch { order: 3; width: 100%; margin-left: 0; }
   .topsearch kbd { display: none; }
+  #addtx { width: 34px; padding: 0; justify-content: center; } #addtx span { display: none; }
   .kpis { grid-template-columns: minmax(0, 1fr); }
   .kpi-top { padding: 12px 16px 12px; }
   .alert { align-items: flex-start; flex-wrap: wrap; font-size: 14px; }
@@ -931,6 +932,7 @@ function renderShell() {
       <header class="top">
         <h1 id="vtitle">Dashboard</h1>
         <label class="topsearch">${ICON.search}<input id="tq" placeholder="Search" aria-label="Search purchases"><kbd>⌘K</kbd></label>
+        <button class="btn dark" id="addtx" title="Add a purchase or income (N)">${ICON.plus}<span>Add purchase</span></button>
         <button class="icon-btn" id="bell" aria-label="Purchases to review">${ICON.bell}</button>
         <div class="themesw"><button id="tdark" aria-label="Dark mode">${ICON.moon}</button><button id="tlight" aria-label="Light mode">${ICON.sun}</button></div>
       </header>
@@ -981,6 +983,7 @@ function renderShell() {
   const paintHide = () => { hb.innerHTML = (S.hideAll ? EYE_OFF : EYE) + (S.hideAll ? "Show amounts" : "Hide amounts"); };
   paintHide();
   hb.onclick = () => { S.hideAll = !S.hideAll; store.set("spend_hide_all", S.hideAll ? "1" : "0"); paintHide(); rerender(); };
+  $("#addtx").onclick = () => openTxModal();
   $("#bell").onclick = () => {
     if (!S.stats?.review_count) return toast("Nothing to review");
     S.review = true; S.offset = 0; loadTx(); goTo("#txcard");
@@ -1277,13 +1280,12 @@ function renderCards() {
   const months = Array.from({ length: 13 }, (_, i) => shiftYm(cur, -i));
   if (!months.includes(S.month)) months.push(S.month);
   const opts = months.map((m) => `<option value="${m}" ${m === S.month ? "selected" : ""}>${m === cur ? "This Month" : fmtDay(m + "-15", { month: "short", year: "numeric" })}</option>`).join("");
-  $("#cards").innerHTML = `<div class="panel-h"><h2>My Cards</h2><button class="btn dark" id="add">${ICON.plus}Add</button></div>
+  $("#cards").innerHTML = `<div class="panel-h"><h2>My Cards</h2></div>
     <div>${face}</div><hr>
     <div><div class="spend-h"><h2>Spending</h2><select class="pick" id="pickm" aria-label="Month">${opts}</select></div>
     <div class="spent"><span class="v num">${money(s.total)}</span>${delta !== null ? `<span class="d num"><b class="${delta > 0 ? "up" : "down"}">${delta > 0 ? "↗" : "↘"} ${S.hideAll ? DOTS : pctText(delta)}</b> vs ${esc(s.prev_label)}</span>` : ""}</div>
     <div class="ticks ${tone}" title="${b ? `${Math.round(pct)}% of budget${s.is_current ? ", the marker = even pace" : ""}` : "No budget set"}">${Array.from({ length: N }, (_, i) => `<i class="${i < on ? "on" : ""} ${i === paceAt ? "pace" : ""}"></i>`).join("")}</div>
     <div class="limit num">${b ? `<span>Monthly Limit: <b>${money(b)}</b></span><span>${s.is_current ? `${money(Math.max(0, b - s.total), true)} left` : `${Math.round(pct)}%`}</span>` : `<span>No monthly budget · <a href="#" id="setb">set one</a></span>`}</div></div>`;
-  $("#add").onclick = () => openTxModal();
   $("#pickm").onchange = (e) => setMonth(e.target.value);
   $("#cards").querySelectorAll("[data-bal]").forEach((el) => el.onclick = () => openBalanceModal(A.items.find((x) => x.id === +el.dataset.bal)));
   const sb = $("#setb"); if (sb) sb.onclick = (e) => { e.preventDefault(); openBudgets(); };
@@ -1980,6 +1982,7 @@ function closePop() { document.querySelectorAll(".pop").forEach((p) => p.remove(
 document.addEventListener("click", (e) => { if (!e.target.closest(".pop")) closePop(); });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { closePop(); closeModal(); }
+  if (e.key === "n" && !e.metaKey && !e.ctrlKey && !e.altKey && $("#addtx") && !$(".scrim") && !e.target.closest("input, textarea, select, [contenteditable]")) { e.preventDefault(); openTxModal(); }
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { const q = $("#tq"); if (q) { e.preventDefault(); q.focus(); q.select(); } }
 });
 function catPicker(anchor, tx) {
