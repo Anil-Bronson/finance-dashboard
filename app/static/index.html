@@ -1224,7 +1224,10 @@ function renderAlert() {
   else if (jump) { head = "Spending Alert:"; msg = `${esc(jump.name)} is ${Math.round(((jump.total - jump.prev_total) / jump.prev_total) * 100)}% higher than ${esc(s.prev_label)}`; }
   else if (s.budget) msg = `${money(Math.max(0, s.budget - s.total), true)} left of your ${money(s.budget, true)} budget`;
   else msg = `${money(s.total, true)} spent so far`;
-  $("#alert").innerHTML = `${hit ? ICON.alert : ICON.check}<span class="msg"><b>${head}</b> ${msg}</span>${hit ? `<a href="#" id="alertgo">See details ${ICON.arrow}</a>` : ""}`;
+  const fx = s.fx_pending_count, fxMsg = `${fx} foreign purchase${fx === 1 ? " isn't" : "s aren't"} converted yet and count as $0`;
+  if (fx && !hit) { head = "Heads Up:"; msg = fxMsg; }
+  else if (fx) msg += ` · ${fxMsg}`;
+  $("#alert").innerHTML = `${hit || fx ? ICON.alert : ICON.check}<span class="msg"><b>${head}</b> ${msg}</span>${hit ? `<a href="#" id="alertgo">See details ${ICON.arrow}</a>` : ""}`;
   const go = $("#alertgo");
   if (go) go.onclick = (e) => { e.preventDefault(); S.category = hit.name; S.offset = 0; renderCats(); loadTx(); goTo("#txcard"); };
 }
@@ -2295,7 +2298,7 @@ async function importPreview(req, fname) {
     const sub = r.match
       ? `${r.match.kind === "income" ? "Logged income" : "Logged"}: ${esc(r.match.name)}, ${fmtDay(r.match.ts.slice(0, 10))}${r.fix !== null ? ` · amount → ${money(r.fix)} (was ${money(r.match.amount)})` : ""}`
       : esc(r.reason);
-    return `<div class="imp ${r.ai_unsure ? "unsure" : ""}" ${r.ai_unsure ? `title="The AI wasn't sure. Check this one"` : ""}><span class="note num">${fmtDay(r.date, { month: "short", day: "numeric" })}</span>
+    return `<div class="imp ${r.ai_unsure || r.check ? "unsure" : ""}" ${r.check ? `title="Same amount, but the names don't match. Check it's the same purchase"` : r.ai_unsure ? `title="The AI wasn't sure. Check this one"` : ""}><span class="note num">${fmtDay(r.date, { month: "short", day: "numeric" })}</span>
       <div class="m"><b>${esc(r.description)}</b>${sub ? `<small>${sub}</small>` : ""}</div>
       <span class="num ${r.money_in ? "pos" : ""}">${r.money_in ? "+" : ""}${money(Math.abs(r.amount))}</span>
       ${r.action === "seen" ? `<span class="note">${esc(r.reason)}</span>` : select(r)}</div>`;
@@ -2304,7 +2307,8 @@ async function importPreview(req, fname) {
     ["New", pv.rows.filter((r) => r.action === "purchase" || r.action === "income"), true],
     ["Paid back", pv.rows.filter((r) => r.action === "payback"), true],
     ["Skipped", pv.rows.filter((r) => r.action === "skip"), true],
-    ["Already logged", pv.rows.filter((r) => r.action === "matched"), false],
+    ["Check these matches (same amount, different name)", pv.rows.filter((r) => r.action === "matched" && r.check), true],
+    ["Already logged", pv.rows.filter((r) => r.action === "matched" && !r.check), false],
     ["Imported before", pv.rows.filter((r) => r.action === "seen"), false],
   ].filter((g) => g[1].length);
   const n = pv.counts;
