@@ -147,15 +147,17 @@ assert c.get("/settings", headers=H).json()["monthly_budget"] == 2000
 
 # ---- budgets ----
 c.post("/categories", headers=H, json={"name": "Hobbies"})
-hist = {"2026-09": 10000, "2026-10": 10000, "2026-11": 12000, "2026-12": 200000, "2027-02": 11000}  # Jan: nothing
+# Fixed months far from today, so purchases other tests log around the real date (the recurring
+# test runs two months ahead) can't land in them.
+hist = {"2019-09": 10000, "2019-10": 10000, "2019-11": 12000, "2019-12": 200000, "2020-02": 11000}  # Jan: nothing
 with sqlite3.connect(DB) as x:
     for ym, cents in hist.items():
         x.execute("""INSERT INTO tx(ts, amount_cents, merchant, card, category, merchant_key, source)
                      VALUES (?,?,?,'',?,?, 'manual')""", (f"{ym}-10T12:00:00-08:00", cents, "Hobby Shop", "Hobbies", "hobby shop"))
-with mock.patch.object(main, "today", return_value=date(2027, 3, 15)):
+with mock.patch.object(main, "today", return_value=date(2020, 3, 15)):
     b = c.get("/budgets", headers=H).json()
 hob = next(i for i in b["items"] if i["name"] == "Hobbies")
-assert b["months"] == ["2026-09", "2026-10", "2026-11", "2026-12", "2027-02"], b["months"]  # January: no data at all
+assert b["months"] == ["2019-09", "2019-10", "2019-11", "2019-12", "2020-02"], b["months"]  # January: no data at all
 assert hob["typical"] == 110 and hob["average"] == 486 and hob["last"] == 110, hob  # median ignores December
 assert b["total"] == 2000
 assert c.put("/budgets", headers=H, json={"categories": {"Nope": 5}}).status_code == 422
